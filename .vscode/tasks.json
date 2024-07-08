@@ -75,6 +75,51 @@
             "problemMatcher": [
                 "$gcc"
             ]
-        }
+        },
+        {
+            "label": "V14 - Compile 4dm to 4do custom batch file (12d model macro)",
+            "type": "process",
+            "options": {
+                "cwd": "${fileDirname}"
+            },
+            "command": "${workspaceFolder}/build/Make_4do_From_4dm_V14.bat",
+            "args": [
+                "${file}"
+            ],
+            "problemMatcher": {
+                "base": "$gcc",
+                "fileLocation": "autoDetect",
+                "severity": "error",
+                "pattern": {
+                    "regexp": "^\"(.*?)\",(.*?)line (.*?)\\.(.*?)\\: (.*?)\\: (.*)",
+                    "file": 1,
+                    "line": 3,
+                    "column": 4,
+                    "code": 5,
+                    "message": 6
+                }
+            },
+            "presentation": {
+                "echo": false,
+                "reveal": "never",
+                "panel": "dedicated",
+                "focus": true,
+                "clear": true
+            }
+        },
+        {
+            "label": "V14 - Build",
+            "dependsOrder": "sequence",
+            "dependsOn": [
+                "V14 - Compile 4dm to 4do custom batch file (12d model macro)"
+            ],
+            "group": {
+                "kind": "build",
+                "isDefault": false
+            },
+            "problemMatcher": [
+                "$gcc"
+            ]
+        },
     ]
     }
