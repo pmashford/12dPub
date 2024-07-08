@@ -1,0 +1,24 @@
+{
+    //Base VS Code-specific settings
+    "terminal.integrated.defaultProfile.windows": "Command Prompt", //Uses command prompt as the terminal instead of the default PowerShell
+    "editor.suggest.localityBonus": true, // Controls whether sorting favours words that appear close to the cursor
+    "editor.wordBasedSuggestions": true, // Enable word based suggestions
+    "editor.mouseWheelZoom": true, //Enable zooming with Ctrl+Scroll wheel
+    // Controls if quick suggestions should show up while typing
+    "editor.quickSuggestions": {
+        "other": true,
+        "comments": false,
+        "strings": false
+    },
+    "files.associations": {
+        "*.4dm": "cpp",
+        "*.h": "cpp",
+        "*.rh": "cpp",
+        "*.4d": "cpp",
+        "xutility": "cpp"
+    },
+
+    //Extension-specific settings
+    "C_Cpp.intelliSenseEngine": "Tag Parser", //Needed so that Intellisense works
+    "AllAutocomplete.showOpenDocuments": false //Restricts 'AllAutocomplete' extension to only show autocomplete entries from the current document
+} 

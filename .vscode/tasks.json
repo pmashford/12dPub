@@ -1,0 +1,74 @@
+{
+    // See https://go.microsoft.com/fwlink/?LinkId=733558
+    // for the documentation about the tasks.json format
+    "version":"2.0.0", 
+    "owner": "cpp",
+    "tasks":[
+        {
+            "label": "Build 4do",
+            "type": "process",
+            "options": {
+                "cwd": "${fileDirname}",
+                "env": {
+                    "CPLUS_INCLUDE_PATH": "X:/12d/MACROS/_INCLUDES" 
+                }
+            },
+            
+            "command": "C:/Program Files/12d/12dmodel/15.00/nt.x64/cc4d.exe",
+            "args": [
+                "-allow_id_calls",
+                "-allow_old_calls",
+                "${file}"
+            ],
+            "problemMatcher": {
+                "base": "$gcc",
+                //"fileLocation": "relative",
+                "fileLocation": "autoDetect",
+                "severity": "error",
+                "pattern": {
+                    "regexp": "^\"(.*?)\",(.*?)line (.*?)\\.(.*?)\\: (.*?)\\: (.*)",
+                    "file": 1,
+                    "line": 3,
+                    "column": 4,
+                    "code": 5,
+                    "message": 6
+                }
+            },
+            "presentation": {
+                "echo": false,
+                "reveal": "never",
+                "panel": "dedicated",
+                "focus": true,
+                "clear": true
+            }
+        },
+        {
+            "label": "Copy 4do",
+            "type": "shell",
+            "command": "copy \"${fileDirname}\\${fileBasenameNoExtension}.4do\" \"C:\\Users\\Public\\12d\\TEMP\\_HOT_OFF_THE_PRESS.4do",
+            "presentation": {
+                "echo": true,
+                "reveal": "never",
+                "panel": "shared",
+                "focus": true,
+                "clear": false
+            },
+            "problemMatcher": []
+        },
+        {
+            "label": "Build",
+            "dependsOrder": "sequence",
+            "dependsOn": [
+                "Build 4do",
+                "Copy 4do"
+            ],
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            },
+            "problemMatcher": [
+                "$gcc"
+            ]
+        }
+    ]
+    }

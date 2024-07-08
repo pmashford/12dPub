@@ -2,32 +2,6 @@
 #define CHECK_VIEW_MUST_EXIST  2
 #define VIEW_EXISTS         7
 
-// Integer check_do_slide1(Real x[], Real y[], Real temp_x, Real temp_y){
-
-//     Real dx = x[2] - x[1];
-//     Real dy = y[2] - y[1];
-//     Real len = Sqrt(dx*dx + dy*dy);
-//     Real udx = dx / len;
-//     Real udy = dy / len;
-
-//     Real vdx = temp_x - x[1];
-//     Real vdy = temp_y - y[1];
-
-//     Real d = vdx*udx + vdy*udy;
-
-//     dx = x[1] + d*udx;
-//     dy = y[1] + d*udy;
-
-//     dx = temp_x - dx;
-//     dy = temp_y - dy;
-
-//     if( (Absolute(dx)>0.001) || (Absolute(dy)>0.001) ){
-//         x[1]+=dx;   y[1]+=dy;
-//         x[2]+=dx;   y[2]+=dy;
-//         return (1);
-//     }
-//     return (0);
-// }
 
 Integer check_do_slide(Real x[], Real y[], Real temp_x, Real temp_y){
 
@@ -196,34 +170,7 @@ void dynamic_section_panel(){
             }
             x[2]+=dx;   y[2]+=dy;
 
-            // #if 1
-            // Highlight_reset(highlight_id);
-            // Highlight_add_line(highlight_id, highlight_colour,x[1],y[1],x[2],y[2]);
-            // Highlight_redraw(highlight_id);
-            // #endif
-            // #if 0
-            // //Highlight_clear_drawing(highlight_id);
-            // Highlight_reset(highlight_id);
-            // // Highlight_remove(highlight_id);
-            // Highlight_add_line(highlight_id, highlight_colour,x[1],y[1],x[2],y[2]);
-            //  Highlight_draw(highlight_id);
-            // // Highlight_redraw(highlight_id);
-            // #endif
 
-            // #if 0
-            // Highlight_delete_all();
-            // Integer highlight_id3 = Highlight_create();
-            // Highlight_add_line(highlight_id3, highlight_colour+1,x[1],y[1],x[2],y[2]);
-            // Highlight_draw(highlight_id3);
-            // #endif
-
-            // #if 0
-
-            // Integer highlight_id2 = Highlight_create();
-            // Highlight_add_line(highlight_id2, highlight_colour+1,x[1],y[1],x[2],y[2]);
-            // Highlight_draw(highlight_id2);
-            // Highlight_remove(highlight_id2);
-            // #endif
 #if VERSION_4D > 1400
             Highlight_reset(highlight_id);
             Highlight_add_line(highlight_id, highlight_colour,x[1],y[1],x[2],y[2]);

@@ -1,0 +1,23 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "12dPL v15",
+            "type": "cppvsdbg",
+            "request": "launch",
+            "program": "C:/Program Files/12d/12dmodel/15.00/nt.x64/cc4d.exe",
+            //"args":["-p", "-proto","-nocpp","-nolines","-allow_id_calls","-allow_old_calls","-keep_cpp", "${file}"],
+            "args":["-allow_id_calls","-allow_old_calls", "${file}"],
+            "stopAtEntry": false,
+            //"cwd": "${workspaceFolder}",
+            "cwd": "${fileDirname}",
+            "environment": [{ "name": "CPLUS_INCLUDE_PATH", "value": "X:/12d/MACROS/_INCLUDES" }],
+            "logging": {
+                "moduleLoad": false
+            }
+        }
+    ]
+}
