@@ -1,0 +1,5 @@
+#log files
+*.log
+
+# 4do's under source
+src/**/*.4do
