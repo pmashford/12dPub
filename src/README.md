@@ -1,2 +1,5 @@
 # 12d Source
-This is a publicly visible macro source files, grouped into folders by a theme
+
+ - These are some dirctories holding some macro source
+ - Folders group macros by a theme
+ 
