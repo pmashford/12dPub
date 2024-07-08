@@ -1,6 +1,6 @@
 //model walk
 
-#include "mashy_lib_security.H"
+#include <mashy_lib_security.H>
 #include "mashy_lib_standard_library.H"
 #include "mashy_lib_widgets_list_box.H"
 #include "mashy_lib_widgets_validate.H"
@@ -111,7 +111,6 @@ Integer manage_a_panel(Integer &posx, Integer &posy, Integer &size, Integer &but
 	read_defaults_file(view_box, input_box, size);
 
 	refresh_list_box(list_box,input_box);
-
 
 
 	if(button_focus){

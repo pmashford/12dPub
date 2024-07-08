@@ -3,3 +3,9 @@
 
 # 4do's under source
 src/**/*.4do
+
+# 4dl log files
+*.4dl
+
+#
+bin/_macro_hot_off_the_press.4do

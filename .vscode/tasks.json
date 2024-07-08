@@ -4,25 +4,18 @@
     "version":"2.0.0", 
     "owner": "cpp",
     "tasks":[
-        {
-            "label": "Build 4do",
-            "type": "process",
+         {
+            "label": "Compile 4dm to 4do custom batch file (12d model macro)",
+            "type":"process",
             "options": {
                 "cwd": "${fileDirname}",
-                "env": {
-                    "CPLUS_INCLUDE_PATH": "X:/12d/MACROS/_INCLUDES" 
-                }
             },
-            
-            "command": "C:/Program Files/12d/12dmodel/15.00/nt.x64/cc4d.exe",
+            "command": "${workspaceFolder}/build/Make_4do_From_4dm.bat", // using a batch file to build and do some copying of the built 4do to /bin/ along with some info at time of compile
             "args": [
-                "-allow_id_calls",
-                "-allow_old_calls",
                 "${file}"
             ],
             "problemMatcher": {
                 "base": "$gcc",
-                //"fileLocation": "relative",
                 "fileLocation": "autoDetect",
                 "severity": "error",
                 "pattern": {
@@ -43,24 +36,10 @@
             }
         },
         {
-            "label": "Copy 4do",
-            "type": "shell",
-            "command": "copy \"${fileDirname}\\${fileBasenameNoExtension}.4do\" \"C:\\Users\\Public\\12d\\TEMP\\_HOT_OFF_THE_PRESS.4do",
-            "presentation": {
-                "echo": true,
-                "reveal": "never",
-                "panel": "shared",
-                "focus": true,
-                "clear": false
-            },
-            "problemMatcher": []
-        },
-        {
             "label": "Build",
             "dependsOrder": "sequence",
             "dependsOn": [
-                "Build 4do",
-                "Copy 4do"
+                "Compile 4dm to 4do custom batch file (12d model macro)" // only need this one using the batch file
             ],
             "group": {
                 "kind": "build",
@@ -69,6 +48,33 @@
             "problemMatcher": [
                 "$gcc"
             ]
-        }
+        },
+        {
+            "label": "Create a new prototypes file (12d model macro)",
+            "type":"shell",
+            "options": {
+                "cwd": "${fileDirname}",
+            },
+            "command": "C:/Program Files/12d/12dmodel/15.00/nt.x64/cc4d.exe",
+            "args": [
+                "-list",
+                "${workspaceFolder}/prototypesv15.4dm" // this creates a XML also, cant seem to help it :(
+            ],
+        },
+        {
+            "label": "Create 4dm prototypes",
+            "dependsOrder": "sequence",
+            "dependsOn": [
+                "Create a new prototypes file (12d model macro)" // only need this one using the batch file
+            ],
+            "group": {
+                "kind":"none" ,
+                "isDefault": false,
+
+            },
+            "problemMatcher": [
+                "$gcc"
+            ]
+        },
     ]
     }
