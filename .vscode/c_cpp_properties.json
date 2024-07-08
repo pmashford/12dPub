@@ -7,7 +7,7 @@
                 "${workspaceRoot}",
                 "${workspaceFolder}/**",
                 "${workspaceFolder}",
-                "X:/12d/MACROS/_INCLUDES",
+                "${workspaceFolder}/include",
                 "C:/Program Files/12d/12dmodel/15.00/set_ups"
             ],
             "defines": [

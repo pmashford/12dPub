@@ -7,5 +7,8 @@ src/**/*.4do
 # 4dl log files
 *.4dl
 
-#
+# dont need this to go to repo
 bin/_macro_hot_off_the_press.4do
+
+# dont need this if already have the 4dm
+include/prototypesv15.4dm.xml

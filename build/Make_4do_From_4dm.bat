@@ -13,7 +13,6 @@ set "fullpath2=%~1"
 :: Remove everything after \src\ (including \src\)
 set "repohome=%fullpath2:\src\=" & rem %"
 
-
 for %%I in ("!fullpath!") do (
 	set "filePath=%%~dpI"
 	set "fileBase=%%~nI"
@@ -21,7 +20,6 @@ for %%I in ("!fullpath!") do (
 )
 
 set "repobin=!repohome!\bin"
-rem set "fileTarget=%repohome%\bin\%fileBase%.4do"
 
 echo fullpath : %fullpath%
 echo filePath : %filePath%
@@ -29,12 +27,6 @@ echo fileBase : %fileBase%
 echo fileBaseExt : %fileBaseExt%
 echo fileTarget : %fileTarget%
 echo repobin : %repobin%
-
-
-rem set CPLUS_INCLUDE_PATH=%path%
-rem echo CPATH=%cpath%
-rem set cpath=C:\GitHub\12dMac\include
-rem path %cpath%;%path% 
 
 if exist "C:\Program Files\12d\12dmodel\15.00\nt.x64\12d.exe" set where=C:\Program Files\12d\12dmodel\15.00\nt.x64
 
@@ -56,8 +48,8 @@ REM END code to get QUOTED_CC4D_VERSION_DATA
 
 cd /d "%filePath%"
 
-rem DONT LOG, LET VSCODE DO FROM STDERR? set mycmd="%where%\cc4d.exe" -log X:\12d\Temp\temp.4dl "%fullpath%"  -allow_old_calls -D"QUOTED_CC4D_VERSION_DATA=\"\\\"%QUOTED_CC4D_VERSION_DATA%\\\"\""
-set mycmd="%where%\cc4d.exe" "%fullpath%"  -allow_old_calls -D"QUOTED_CC4D_VERSION_DATA=\"\\\"%QUOTED_CC4D_VERSION_DATA%\\\"\""
+rem ! DONT LOG TO FILE, LET VSCODE DO FROM STDERR? set mycmd="%where%\cc4d.exe" -log X:\12d\Temp\temp.4dl "%fullpath%"  -allow_old_calls -D"QUOTED_CC4D_VERSION_DATA=\"\\\"%QUOTED_CC4D_VERSION_DATA%\\\"\""
+set mycmd="%where%\cc4d.exe" "%fullpath%" -allow_old_calls -D"QUOTED_CC4D_VERSION_DATA=\"\\\"%QUOTED_CC4D_VERSION_DATA%\\\"\""
 %mycmd%
 echo %mycmd%
 

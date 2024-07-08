@@ -1,6 +1,6 @@
 //model walk
 
-#include <mashy_lib_security.H>
+#include "mashy_lib_security.H"
 #include "mashy_lib_standard_library.H"
 #include "mashy_lib_widgets_list_box.H"
 #include "mashy_lib_widgets_validate.H"
@@ -21,7 +21,6 @@ void validate_size(Integer &size){
 
 Integer get_model_list_in_order_grouped_with_wildcard(Dynamic_Text &list){
 	get_model_list_in_order(list);
-
 
 	return 0;
 }

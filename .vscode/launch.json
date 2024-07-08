@@ -14,7 +14,8 @@
             "stopAtEntry": false,
             //"cwd": "${workspaceFolder}",
             "cwd": "${fileDirname}",
-            "environment": [{ "name": "CPLUS_INCLUDE_PATH", "value": "X:/12d/MACROS/_INCLUDES" }],
+            //"environment": [{ "name": "CPLUS_INCLUDE_PATH", "value": "X:/12d/MACROS/_INCLUDES" }],
+            "environment": [{ "name": "CPLUS_INCLUDE_PATH", "value": "${workspaceFolder}/include" }],
             "logging": {
                 "moduleLoad": false
             }
