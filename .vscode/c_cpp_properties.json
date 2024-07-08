@@ -8,6 +8,7 @@
                 "${workspaceFolder}/**",
                 "${workspaceFolder}",
                 "${workspaceFolder}/include",
+                "${workspaceFolder}/../12dMac/include",
                 "C:/Program Files/12d/12dmodel/15.00/set_ups"
             ],
             "defines": [
