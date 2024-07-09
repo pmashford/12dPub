@@ -1,6 +1,6 @@
 //model walk
 
-#include <mashy_lib_security.H>
+#include "mashy_lib_security.H"
 #include "mashy_lib_standard_library.H"
 #include "mashy_lib_widgets_list_box.H"
 #include "mashy_lib_widgets_validate.H"
@@ -8,7 +8,7 @@
 #include "mashy_lib_sort.H"
 #include "mashy_lib_text_functions.H"
 #include "mashy_lib_model_functions.H"
-#include "mashy_lib_about_panel_SKM.H"
+#include "mashy_lib_about_panel.H"
 #include "mashy_lib_winhelp.4dm"
 #include "defaults.H"
 
@@ -77,8 +77,6 @@ Integer manage_a_panel(Integer &posx, Integer &posy, Integer &size, Integer &but
 	Append(button_grow,hg_resize);
 	Append(button_shrink,hg_resize);
 
-	Button skmcad_help_button = Create_button("  Help  ","ModelWalk.html");
-
 	Horizontal_Group hg = Create_horizontal_group(0);
 	Append(view_box,hg);
 	Append(input_box,hg);
@@ -91,7 +89,6 @@ Integer manage_a_panel(Integer &posx, Integer &posy, Integer &size, Integer &but
 	Horizontal_Group hg2 = Create_horizontal_group(0);
 	Append(hg_buttons,hg2);
 	Append(hg_resize,hg2);
-	Append(skmcad_help_button,hg2);
 
 	Append(hg2,vg);
 
@@ -141,13 +138,10 @@ Integer manage_a_panel(Integer &posx, Integer &posy, Integer &size, Integer &but
 					return(1);
 				}
 				if(cmd == "Panel About"){
-					manage_about_panel_skm();
+					manage_about_panel();
 				}
 			} break;
 
-			case Get_id(skmcad_help_button):{
-				open_skmcad_help(cmd);
-			}break;
 
 			case Get_id(button) : {
 				if(cmd == "refresh"){
@@ -214,7 +208,6 @@ Integer manage_a_panel(Integer &posx, Integer &posy, Integer &size, Integer &but
 }
 void main(){
 	standard_skm_macro_message("Model Walk");
-	lock_to_skm_cad();
 	Integer x,y;
 	Integer size=2;
 	View_Box b1; Input_Box b2;
