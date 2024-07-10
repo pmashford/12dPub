@@ -4,6 +4,20 @@
 #include "set_ups.h"
 #include "mashy_lib_model_functions.h"
 
+#if 0
+// very useful set of calls to use in panels to validate widets where:
+//		- must_exist() will trigger the break
+//		- check_exist() will just do the validation without
+	case Get_id(button) : {
+		if(cmd == "process"){
+			Dynamic_Element delt;
+			if(must_exist(source_box,delt,message))break;
+			Real separation;
+			if(must_exist(real_box,separation,message))break;
+//	....
+#endif
+
+
 //validate boxes
 //must exist returns 0 for success
 //check exist returns 1 if a valid value was entered, 0 if none was entered - nulls the value if possible
