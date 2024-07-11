@@ -26,7 +26,7 @@ Shout me out if there's something helpful or useful
 * There is a .vscode folder ready to go
 * From vscode use **Open Folder...** and select the base repo folder
 * There is a task to generate a new protypes file
-* the prototypes.4dm file within /include/ gets most of the highlighting for the 4dm language
+* The prototypes.4dm file within /include/ gets most of the highlighting for the 4dm language
 
 ### CPATH
 * Set the windows environment variable **CPATH** to be equal to **drive:/full/path/12dPub/include**
