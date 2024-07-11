@@ -2,6 +2,13 @@
 
 Publicly visible 12d stuff
 
+## Directories
+* /.vscode/ : vscode setup
+* /bin/     : some 4do's compile from /src/
+* /build/   : batch file used by vscode to call cc4d.exe and 4dm->4do
+* /include/ : Over time I'll add various functions from my librarys
+* /src/     : Over time I'll add various macro source
+
 Shout me out if there's something helpful or useful
 
 ## REPO NOTES
