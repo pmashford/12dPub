@@ -20,7 +20,7 @@
 		switch(id){
 			case Get_id(panel) : {
 				if(cmd == "Panel Quit") return(1);
-				if(cmd == "Panel About")	manage_about_panel_skm();
+				if(cmd == "Panel About")	manage_about_panel();
 			} break;
 
 #endif
@@ -284,23 +284,18 @@ Integer manage_about_panel(){
 	Show_widget(panel);
 	draw_about_panel_draw_box_logo(draw_box);
 
-
 	while(1){
 		Integer id;
 		Text cmd,msg;
 		Wait_on_widgets(id,cmd,msg);
-#if DEBUG
-		Print("Id=" + To_text(id) + " cmd=" + cmd + " msg=" + msg + "\n");
-#endif
+		// Print("Id=" + To_text(id) + " cmd=" + cmd + " msg=" + msg + "\n");
 		if(cmd == "keystroke") continue;
-
-		switch(id){
-			case Get_id(panel) : {
-				if(cmd == "Panel Quit") return(0);
-			} break;
-
-
-		}
+		if(cmd == "Panel Quit") return(0);
+        if(cmd == "CodeShutdown"){
+#if VERSION_4D > 1400
+            Set_exit_code(cmd);
+#endif
+        }
 	}
 	return(0);
 }

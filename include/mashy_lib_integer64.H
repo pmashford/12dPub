@@ -149,10 +149,10 @@ Text i32_to_b(Integer v){
 	Text t = "";
 	Integer b =1;
 	for(Integer i=1;i<=32;i++){
-		if(!Mod(i-1,4)){
+		if(!Mod(i-1,4)){ // put a space every 4th character
 			t=" "+t;
 		}
-		t = ((b&v)? "1" : "0" )+ t;
+		t = ((b&v)? "1" : "0" )+ t; // b == 1,2,4,... extract the bit and tack on the front of (t).. (on 32nd iteration b overflows to negative: binary: [1000 0000 0000 0000 0000 0000 0000 0000 ] hex/base16: [80000000] int32: [-2147483648])
 		b+=b;
 
 	}

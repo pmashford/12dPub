@@ -2,6 +2,7 @@
 #define CHECK_VIEW_MUST_EXIST  2
 #define VIEW_EXISTS         7
 
+#include "mashy_lib_about_panel.H"
 
 Integer check_do_slide(Real x[], Real y[], Real temp_x, Real temp_y){
 
@@ -118,6 +119,9 @@ void dynamic_section_panel(){
         if(cmd == "Panel Quit"){
             doit = 0;
         }
+        if(cmd == "Panel About"){
+            manage_about_panel();
+        }
         if(cmd == "CodeShutdown"){
 #if VERSION_4D > 1400
             Set_exit_code(cmd);
@@ -207,5 +211,6 @@ void dynamic_section_panel(){
 
 void main(){
     dynamic_section_panel();
+    
     Print("Dynamic_Section_Panel.4do by Paul Mashford\n");
 }
