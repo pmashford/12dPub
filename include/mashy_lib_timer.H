@@ -2,12 +2,12 @@
 #define MASHY_LIB_TIMER_START_H
 
 Real timer(Real &t){
-	Real x = t;
-	if(Is_null(t) || t == 0.0){
+	Real x;
+	Time(x);
+	if(Is_null(t) || Xeqy(t,0.0)){
 		Time(t);
 		return(t);
 	}else{
-		Time(x);
 		Print("Elapsed="+To_text(x-t,6)+" , ( stop["+To_text(x,6)+"] - start ["+To_text(t,6)+"] )\n");
 		Null(x);
 		Null(t);
@@ -16,12 +16,12 @@ Real timer(Real &t){
 }
 
 Real timer(Real &t, Message_Box &box){
-	Real x = t;
-	if(Is_null(t) || t == 0.0){
+	Real x;
+	Time(x);
+	if(Is_null(t) || Xeqy(t,0.0)){
 		Time(t);
 		return(t);
 	}else{
-		Time(x);
 		Text my_text = "Elapsed="+To_text(x-t,6)+" , (stop["+To_text(x,6)+"] - start["+To_text(t,6)+"])";
 		Print(my_text+"\n");
 		Set_data(box,my_text);

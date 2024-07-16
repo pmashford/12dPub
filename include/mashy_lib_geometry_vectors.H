@@ -178,31 +178,9 @@ Real get_angle_between_vectors(Vector2 &v1, Vector2 &v2){
 	v2 = Get_vector_normalize(v2);
 	return (get_dot_product(v1,v2));
 }
-/*
-axis-angle version
-sfrotation angleBetween(sfvec3f v1,sfvec3f v2) {
-	float angle;
-	// turn vectors into unit vectors
-	n1 = v1.norm();
-	n2 = v2.norm();
-	angle = Math.acos( sfvec3f.dot(n1,n2) );
-	// if no noticable rotation is available return zero rotation
-	// this way we avoid Cross product artifacts
-	if( Math.abs(angle) < 0.0001 ) return new sfrotation( 0, 0, 1, 0 );
-	// in this case there are 2 lines on the same axis
-	if(Math.abs(angle)-Math.pi) < 0.001){
-		n1 = n1.Rotx( 0.5f );
-		// there are an infinite number of normals
-		// in this case. Anyone of these normals will be
-		// a valid rotation (180 degrees). so I rotate the curr axis by 0.5 radians this way we get one of these normals
-	}
- 	sfvec3f axis = n1;
-	axis.cross(n2);
-	return new sfrotation(axis.x,axis.y,axis.z,angle);
-}
-*/
+
+
 //angle between 2 vectors
-// the result of a dot product is a number
 Real get_dot_product(Vector3 &v1, Vector3 &v2){
 ///these vectors should be normalized if you want the radians
 	Real x[2],y[2],z[2];
@@ -238,42 +216,6 @@ Real get_slope(Vector3 &v1){
 	return (get_angle_between_vectors(v1,v2));
 }
 
-/*
-
-// intersect3D_SegmentPlane(): intersect a segment and a plane
-//    Input:  S = a segment, and Pn = a plane = {Point V0; Vector n;}
-//    Output: *I0 = the intersect point (when it exists)
-//    Return: 0 = disjoint (no intersection)
-//            1 = intersection in the unique point *I0
-//            2 = the segment lies in the plane
-int
-intersect3D_SegmentPlane( Segment S, Plane Pn, Point* I )
-{
-    Vector    u = S.P1 - S.P0;
-    Vector    w = S.P0 - Pn.V0;
-
-    float     D = dot(Pn.n, u);
-    float     N = -dot(Pn.n, w);
-
-    if (fabs(D) < SMALL_NUM) {          // segment is parallel to plane
-        if (N == 0)                     // segment lies in plane
-            return 2;
-        else
-            return 0;                   // no intersection
-    }
-    // they are not parallel
-    // compute intersect param
-    float sI = N / D;
-    if (sI < 0 || sI > 1)
-        return 0;                       // no intersection
-
-    *I = S.P0 + sI * u;                 // compute segment intersect point
-    return 1;
-}
-
-*/
-
-
 #define SMALL_NUM 0.0000001
 Integer get_segment_intersect_with_plane(Real sx[], Real sy[], Real sz[], Point &known_point_on_plane, Vector3 &normal_vector_to_plane, Real &x, Real &y, Real &z){
 //return -ve if segment is parallel or coincidental
@@ -282,8 +224,8 @@ Integer get_segment_intersect_with_plane(Real sx[], Real sy[], Real sz[], Point 
 
 #if 0
 //highjacking here works perfectly - therefore the normal or the point are not getting constructed
-	Set_vector(normal_vector_to_plane,0,10,10);
-	Set_x(known_point_on_plane,0);Set_y(known_point_on_plane,10);Set_z(known_point_on_plane,2);
+	Set_vector(normal_vector_to_plane,0.0,10.0,10.0);
+	Set_x(known_point_on_plane,0.0);Set_y(known_point_on_plane,10.0);Set_z(known_point_on_plane,2.0);
 
 	//Print("x "+To_text(x,3)+" y "+To_text(y,3)+" z "+To_text(z,3));Print();
 	//Print("done - get_segment_intersect_with_plane");Print();
@@ -297,7 +239,7 @@ Integer get_segment_intersect_with_plane(Real sx[], Real sy[], Real sz[], Point 
 	x = sx[1] + u * (sx[2] - sx[1]);
 	y = sy[1] + u * (sy[2] - sy[1]);
 	z = sz[1] + u * (sz[2] - sz[1]);
-	if(u < 0 || u > 1) return 1; //return 1 if the segment intersects if extended
+	if(u < 0.0 || u > 1.0) return 1; //return 1 if the segment intersects if extended
 	return 0;
 }
 
