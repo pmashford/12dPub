@@ -97,7 +97,7 @@ Integer get_normal_vector(Real x[], Real y[], Real z[], Real &nx, Real &ny, Real
 	nx = (y[2] - y[1])*(z[3] - z[1]) - (y[3] - y[1])*(z[2] - z[1]);
 	ny = (z[2] - z[1])*(x[3] - x[1]) - (z[3] - z[1])*(x[2] - x[1]);
 	nz = (x[2] - x[1])*(y[3] - y[1]) - (x[3] - x[1])*(y[2] - y[1]);
-	if(nz < 0){ // the vector must point up
+	if(nz < 0.0){ // the vector must point up
 		nx*=(-1.0);
 		ny*=(-1.0);
 		nz*=(-1.0);
@@ -115,7 +115,7 @@ Integer get_normal_vector_from_two_points(Real x[], Real y[], Real z[], Vector3 
 	Real nx = ( (y[2] - y[1]) * (z3 - z[1]) ) - ( (z[2] - z[1]) * (y3 - y[1]) );
 	Real ny = ( (z[2] - z[1]) * (x3 - x[1]) ) - ( (x[2] - x[1]) * (z3 - z[1]) );
 	Real nz = ( (x[2] - x[1]) * (y3 - y[1]) ) - ( (y[2] - y[1]) * (x3 - x[1]) );
-	if(nz < 0){ // the vector must point up
+	if(nz < 0.0){ // the vector must point up
 		nx*=(-1.0);
 		ny*=(-1.0);
 		nz*=(-1.0);
@@ -134,7 +134,7 @@ void get_perpendicular_vector(Real &Vx, Real &Vy, Real &Vz, Real &px, Real &py, 
 	//now we have 2 vectors which are said to be normal to each other.
 	px = Vy * (-1.0);
 	py = Vx;
-	pz = 0;
+	pz = 0.0;
 }
 
 Vector3 get_perpendicular_vector(Vector3 &vector){

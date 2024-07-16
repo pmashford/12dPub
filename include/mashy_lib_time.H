@@ -61,6 +61,14 @@ Text get_timestamp(){
 //   return ( To_text(d) + "-" + To_text(m) + "-" + To_text(y) + " 00:00:00");
 }
 
+Text get_timestamp_for_element_name(){
+   Integer time;   Time(time);
+   //time -= (10*60*60);
+   Text format = "%y-%m-%d %H-%M-%S";
+   Text time_text;   Convert_time(time,format,time_text);
+   return ( time_text );
+}
+
 Text get_timestamp_adjust(Integer hours){
    //will adjust time by hours
    Integer time;   Time(time);

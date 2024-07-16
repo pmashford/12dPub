@@ -289,6 +289,7 @@ Integer triangle_get_slope(Real x[], Real y[], Real z[], Integer npts_is_3, Real
 }
 
 Integer tin_get_slope_aspect(Tin &tin, Integer triangle, Real &slope, Real &aspect){
+// todo: more effiecient method in raindrop macro
 	Real nx,ny,nz;
 	Integer ierr = tin_get_normal_vector(tin, triangle, nx, ny, nz);
 	//now calc slope
@@ -318,6 +319,13 @@ Integer tin_get_slope_aspect(Tin &tin, Integer triangle, Real &slope, Real &aspe
 	return ierr;
 }
 
+Integer is_valid(Tin &tin, Integer triangle){
+// if inside ==2 then this is a valid triangle
+	Integer inside;
+	Tin_get_triangle_inside(tin,triangle,inside);	// 2 is valid and not null(ed)
+	if(inside==2)	return 1;
+	return 0;
+}
 
 Integer tin_get_aspect(Tin tin, Integer triangle, Real &aspect){
 	Real x,y,z;
@@ -441,6 +449,40 @@ Integer tin_get_triangle_point_data(Tin tin, Integer triangle,Integer &pt_nums[]
 	}
 
 	return 0;
+}
+
+Integer tin_get_lowest_triangle_point_index(Real z[]){
+	// z is size of 3, what is the lowest index, should be 1 , 2 or 3.... 
+	Integer lowest_z_idx = 1;
+	Real lowest_z = z[1];
+	for(Integer i=2;i<=3;i++){
+		if(z[i]<lowest_z){
+			lowest_z = z[i];
+			lowest_z_idx =1;
+		}
+	}
+	return lowest_z_idx;
+}
+
+Integer tin_get_triangle(Tin &tin, Integer triangle, Integer pnt[], Real x[], Real y[], Real z[]){
+	Integer ierr = 0;
+	ierr+=Tin_get_triangle_points(tin,triangle,pnt[1],pnt[2],pnt[3]);
+	ierr+=Tin_get_point(tin,pnt[1],x[1],y[1],z[1]);
+	ierr+=Tin_get_point(tin,pnt[2],x[2],y[2],z[2]);
+	ierr+=Tin_get_point(tin,pnt[3],x[3],y[3],z[3]);
+	return ierr;
+}
+
+void tin_get_lowest_triangle_point(Tin &tin, Integer triangle, Integer &pf, Real &xf, Real &yf, Real &zf){
+	// pf is the point index, xf,yf,zf is the coords of the lowest point
+	Real x[3],y[3],z[3];
+	Integer pnt[3];
+	tin_get_triangle(tin, triangle, pnt, x, y, z);
+	Integer idx = tin_get_lowest_triangle_point_index(z);
+	pf = pnt[idx];
+	xf = x[idx];
+	yf = y[idx];
+	zf = z[idx];
 }
 
 Integer tin_get_triangle_lowest_point(Tin tin, Integer triangle){
@@ -611,23 +653,19 @@ Integer tin_get_triangle_edge_point_at_aspect(Tin tin, Real xc, Real yc, Real &h
 //return the triangle that intersects?
 	Real aspect;
 	Integer triangle;
-	if(Tin_get_triangle_from_point(tin, xc, yc,triangle)	!= 0)return -1;
-	if(tin_get_aspect(tin,triangle,aspect)			!= 0)return -2;
+	if(Tin_get_triangle_from_point(tin, xc, yc,triangle)	!= 0)	return -1;	// what triange is xc,yc at?
+	if(tin_get_aspect(tin,triangle,aspect)			!= 0)			return -2;	// what is it's aspect?
 
-	//aspect += Half_pi();
 	Bearing_to_angle(aspect,aspect);
+	Tin_height(tin,xc,yc,height);	// height at the point coming in
 
-	Tin_height(tin,xc,yc,height);
-
-	Real dist = 1000;
+	Real dist = 999.9;
 	Point pnt1,pnt2;
 	Set_x(pnt1,xc);Set_y(pnt1,yc);
 	Locate_point(pnt1,aspect,dist,pnt2);
 	Real x2 = Get_x(pnt2);	Real y2 = Get_y(pnt2);
 
-
-	Integer point[3], n[3];
-	Real x[3], y[3], z[3];
+	Integer point[3], n[3];			Real x[3], y[3], z[3];
 	Integer ierr =Tin_get_triangle(tin, triangle, point[1], point[2], point[3], n[1], n[2], n[3], x[1], y[1], z[1], x[2], y[2], z[2], x[3], y[3], z[3]);
 
 	Integer side = 0;
@@ -635,11 +673,10 @@ Integer tin_get_triangle_edge_point_at_aspect(Tin tin, Real xc, Real yc, Real &h
 		Real xr,yr;
 		Integer ii = i+1;
 		if(ii == 4)ii = 1;
-					//(Real x1,Real y1,Real x2,Real y2,Real x3,Real y3,Real x4,Real y4,Real &xf,Real &yf)
 		Integer int_type = get_segments_intersection(xc,yc,x2,y2,x[i],y[i],x[ii],y[ii],xr,yr);
 		if(int_type == 0){
 			side = i;
-			xf = xr;	//this is the intersection point
+			xf = xr;	//this is the intersection point with the edge of triangle
 			yf = yr;
 			Tin_height(tin,xf,yf,zf);
 			break;
