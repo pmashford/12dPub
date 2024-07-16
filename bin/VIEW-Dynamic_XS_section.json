@@ -1,9 +1,9 @@
 { 
 "file": "VIEW-Dynamic_XS_section.4do", 
-"compileDate": "12/07/2024" , 
-"compileTime": "15:47:18.40" , 
+"compileDate": "17/07/2024" , 
+"compileTime": "7:38:58.27" , 
 "sourceBasename": "VIEW-Dynamic_XS_section.4dm" , 
-"sourceDirname": "C:/GitHub/12dPub/src/Views/Dynamic Section/", 
+"sourceDirname": "/src/Views/Dynamic Section/VIEW-Dynamic_XS_section.4dm", 
 "compiler": "C:/Program Files/12d/12dmodel/15.00/nt.x64/cc4d.exe", 
 "compilerInfo": "Version: 801 / 220 / 7955" 
 } 

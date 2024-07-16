@@ -12,6 +12,9 @@ set "fullpath2=%~1"
 
 :: Remove everything after \src\ (including \src\)
 set "repohome=%fullpath2:\src\=" & rem %"
+:: Remove everything after \src\ (but keep \src\)
+set "filePathRelative=%fullpath2:*\src\=\src\%"
+
 
 for %%I in ("!fullpath!") do (
 	set "filePath=%%~dpI"
@@ -27,6 +30,7 @@ echo fileBase : %fileBase%
 echo fileBaseExt : %fileBaseExt%
 echo fileTarget : %fileTarget%
 echo repobin : %repobin%
+echo filePathRelative : %filePathRelative%
 
 if exist "C:\Program Files\12d\12dmodel\15.00\nt.x64\12d.exe" set where=C:\Program Files\12d\12dmodel\15.00\nt.x64
 
@@ -66,7 +70,7 @@ echo "file": "%fileBase%.4do", >> "%infofile%"
 echo "compileDate": "%date:~-10%" , >> "%infofile%"
 echo "compileTime": "%time: =%" , >> "%infofile%"
 echo "sourceBasename": "%fileBaseExt%" , >> "%infofile%"
-echo "sourceDirname": "%filePath:\=/%", >> "%infofile%"
+echo "sourceDirname": "%filePathRelative:\=/%", >> "%infofile%"
 echo "compiler": "%where:\=/%/cc4d.exe", >> "%infofile%"
 echo "compilerInfo": "%QUOTED_CC4D_VERSION_DATA:\=/%" >> "%infofile%"
 echo } >> "%infofile%"

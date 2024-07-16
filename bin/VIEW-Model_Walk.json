@@ -1,9 +1,9 @@
 { 
 "file": "VIEW-Model_Walk.4do", 
-"compileDate": "09/07/2024" , 
-"compileTime": "12:45:47.35" , 
+"compileDate": "17/07/2024" , 
+"compileTime": "7:39:31.00" , 
 "sourceBasename": "VIEW-Model_Walk.4dm" , 
-"sourceDirname": "C:/GitHub/12dPub/src/Views/Model Walk/", 
+"sourceDirname": "/src/Views/Model Walk/VIEW-Model_Walk.4dm", 
 "compiler": "C:/Program Files/12d/12dmodel/15.00/nt.x64/cc4d.exe", 
 "compilerInfo": "Version: 801 / 220 / 7955" 
 } 
