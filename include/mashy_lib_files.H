@@ -836,35 +836,60 @@ Integer resolve_relative_path(Text t_in, Text &t_out){
 
 Integer valid_path(Text path, Text &fixed){
 // make a path valid, resolving $vars
-	Dynamic_Text parts;
-	get_file_path_parts(path,parts);
-//p(parts);
+	Dynamic_Text parts_dt;
+	get_file_path_parts(path,parts_dt);
 	Integer nparts;
-	Get_number_of_items(parts,nparts);
+	Get_number_of_items(parts_dt,nparts);
+	fixed = path;
+	if(nparts < 1)return 1;
+	fixed = "";
+	Text parts[nparts];
 	Integer c = '$';
 	Integer possible_errors=0;
 	for(Integer i=1;i<=nparts;i++){
-		Text t;
-		Get_item(parts,i,t);
+		Get_item(parts_dt,i,parts[i]);
 		Integer c1;
-		Get_char(t,1,c1);
+		Get_char(parts[i],1,c1);
 		if(c1==c){
-			Text suffix = Get_subtext(t,2,Text_length(t));
+			Text suffix = Get_subtext(parts[i],2,Text_length(parts[i]));
 			Text this_env = Getenv(Text_upper(suffix));
 			if(this_env == ""){
 				this_env = Getenv(Text_upper(suffix)+"_4D");//some environment variables are suffixed *_4D, do a search for them
 			}
 			if(this_env != ""){
-				Set_item(parts,i,this_env);
+				parts[i] = this_env;
 			}else{
 				// do nothing
 				possible_errors++;
 			}
 		}
 	}
-	set_file_path_parts(parts,fixed);
-	//p(fixed);
+	Integer this_part_idx = 0;
+	for(i=1;i<=nparts;i++){ // walk the path
+		if(parts[i]==".")continue;
+		if(parts[i]==".."){
+			if(this_part_idx>0){
+				this_part_idx--;
+			}
+			continue;
+		}
+		this_part_idx++;
+		parts[this_part_idx] = parts[i];
+	}
+	Null(parts_dt);
+	for(i=1;i<=this_part_idx;i++){
+		Append(parts[i],parts_dt);
+	}
+	set_file_path_parts(parts_dt,fixed);
 	return possible_errors;
+}
+
+Text valid_path(Text path){
+	// this will make c:\path//a\$env\c\..\\\..\..\file.txt => c:\path\file.txt, also
+	// will resolve $end within any part of the path
+	Text fixed;
+	valid_path(path,fixed);
+	return fixed;
 }
 
 Text force_last_char_in_path(Text t){
@@ -980,28 +1005,28 @@ Integer get_std_folders(Text &lib_folder,Text &setups_folder,Text &userlib_folde
 // this returns standard folder locations
 // --------------------------------------
 {
-// get project name and project data folder name
-// pname is the data folder name where no spaces are allowed
-// projectname includes spaces
-Text pname;
-Get_project_name(pname);
-projectname = pname;
+	// get project name and project data folder name
+	// pname is the data folder name where no spaces are allowed
+	// projectname includes spaces
+	Text pname;
+	Get_project_name(pname);
+	projectname = pname;
 
-// network path to project folder
-Get_project_folder(projectfoldername);
+	// network path to project folder
+	Get_project_folder(projectfoldername);
 
-// data folder network path used by 12d solutions --- dont use for user data
-//MASHY CHANGED TO NEXT LINE change_spaces(pname); // replaces spaces in project names
-pname =find_replace_repeat(pname," ","_"); //MASHY CHANGED THIS LINE REALLY SHOULD CHECK OUTPUT !!!!!!!!!!!!!!!!
-Print("CHECK THIS OUTPUT, NO SPACES ->  " + pname + "\n");
-projectdata_12_folder = projectfoldername + "\\"  + pname + ".project";
+	// data folder network path used by 12d solutions --- dont use for user data
+	//MASHY CHANGED TO NEXT LINE change_spaces(pname); // replaces spaces in project names
+	pname =find_replace_repeat(pname," ","_"); //MASHY CHANGED THIS LINE REALLY SHOULD CHECK OUTPUT !!!!!!!!!!!!!!!!
+	Print("CHECK THIS OUTPUT, NO SPACES ->  " + pname + "\n");
+	projectdata_12_folder = projectfoldername + "\\"  + pname + ".project";
 
-// get all stadard folders
-setups_folder = replace_env_4d("$SET_UPS","SET_UPS");
-lib_folder = replace_lib_4d("$LIB");
-userlib_folder = replace_user_lib_4d("$USER_LIB");
-user_folder = replace_user_4d("$USER");
-return(0);
+	// get all stadard folders
+	setups_folder = replace_env_4d("$SET_UPS","SET_UPS");
+	lib_folder = replace_lib_4d("$LIB");
+	userlib_folder = replace_user_lib_4d("$USER_LIB");
+	user_folder = replace_user_4d("$USER");
+	return(0);
 }
 
 Integer find_file_std_folders(Text &file_name,Text &path_file){
@@ -1013,16 +1038,16 @@ Integer find_file_std_folders(Text &file_name,Text &path_file){
   Text lib_folder,setups_folder,userlib_folder,user_folder,projectname ,projectdata_12_folder,projectfoldername;
   get_std_folders(lib_folder,setups_folder, userlib_folder,user_folder,projectname ,projectdata_12_folder,projectfoldername);
 
-if ( File_exists(file_name) != 0 ) { path_file = file_name; return(1); }
-else if ( File_exists(projectfoldername +"\\" + file_name) != 0 )   { path_file =  projectfoldername +"\\" + file_name ; return(1); }
-else if ( File_exists(userlib_folder +"\\" + file_name) != 0 ) { path_file =  userlib_folder +"\\" + file_name ;return(1); }
-else if ( File_exists(user_folder +"\\" + file_name) != 0 )    { path_file =  user_folder +"\\" + file_name ; return(1); }
-else if ( File_exists(user_folder +"\\Images" +"\\" + file_name) != 0 )    { path_file =  user_folder +"\\Images" +"\\" +  file_name ; return(1); }
-else if ( File_exists(lib_folder +"\\" + file_name) != 0 )     { path_file =  lib_folder +"\\" + file_name ; return(1); }
-else if ( File_exists(setups_folder +"\\" + file_name) != 0 )     { path_file =  setups_folder +"\\" + file_name ; return(1); }
-else if ( File_exists(setups_folder +"\\Images" +"\\" + file_name) != 0 )     { path_file =  setups_folder +"\\Images" +"\\" + file_name ; return(1); }
-else { file_name = "\n" + "failed to find file " + file_name  + " - macro failed check you have all icon files" + "\n";  return(0); }
-return(0);
+	if ( File_exists(file_name) != 0 ) { path_file = file_name; return(1); }
+	else if ( File_exists(projectfoldername +"\\" + file_name) != 0 )   { path_file =  projectfoldername +"\\" + file_name ; return(1); }
+	else if ( File_exists(userlib_folder +"\\" + file_name) != 0 ) { path_file =  userlib_folder +"\\" + file_name ;return(1); }
+	else if ( File_exists(user_folder +"\\" + file_name) != 0 )    { path_file =  user_folder +"\\" + file_name ; return(1); }
+	else if ( File_exists(user_folder +"\\Images" +"\\" + file_name) != 0 )    { path_file =  user_folder +"\\Images" +"\\" +  file_name ; return(1); }
+	else if ( File_exists(lib_folder +"\\" + file_name) != 0 )     { path_file =  lib_folder +"\\" + file_name ; return(1); }
+	else if ( File_exists(setups_folder +"\\" + file_name) != 0 )     { path_file =  setups_folder +"\\" + file_name ; return(1); }
+	else if ( File_exists(setups_folder +"\\Images" +"\\" + file_name) != 0 )     { path_file =  setups_folder +"\\Images" +"\\" + file_name ; return(1); }
+	else { file_name = "\n" + "failed to find file " + file_name  + " - macro failed check you have all icon files" + "\n";  return(0); }
+	return(0);
 }
 //--------------------------------------------------------------------------------
 //                        Some old shit - very prelim below
