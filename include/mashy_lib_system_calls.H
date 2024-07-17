@@ -5,8 +5,8 @@ Integer run_system_command(Text command); // hack, do protoypes here
 Dynamic_Text run_system_command_get_output(Dynamic_Text &commands);
 Dynamic_Text run_system_command_get_output(Text command);
 
-#include "X:\12d\MACROS\_INCLUDES\mashy_lib_text_functions.H"
-#include "X:\12d\MACROS\_INCLUDES\mashy_lib_files.H"
+#include "mashy_lib_text_functions.H"
+#include "mashy_lib_files.H"
 
 
 #ifndef	CREATE_NO_WINDOW

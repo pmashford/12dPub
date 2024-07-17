@@ -282,10 +282,7 @@ Integer get_extension(Text any_path, Text &extension){
 		Integer c;
 		Get_char(file,i,c);
 		if(c==f){
-			if(c<len){
-				extension = Get_subtext(file,c+1,len);
-
-			}
+			extension = Get_subtext(file,i+1,len);
 			return 0;
 		}
 	}
