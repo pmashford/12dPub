@@ -1,6 +1,7 @@
-#ifndef mashy_lib_panel_handler_std_H_INCLUDED
-#define mashy_lib_panel_handler_std_H_INCLUDED
+#ifndef mashy_lib_widgets_panel_handler_std_H_INCLUDED
+#define mashy_lib_widgets_panel_handler_std_H_INCLUDED
 #include "12d/set_ups.h"
+#include "mashy_lib_about_panel.h"
 #define COMMAND_PARSER_NO_FLAGS 0 // use to echo the command only, good way to test command coverage
 #define COMMAND_PARSER_NO_EXECUTE 1 // use to echo the command only, good way to test command coverage
 
@@ -89,7 +90,7 @@ Text include_panel_now(Text &title, Integer &pos_x, Integer &pos_y, Text button_
         Integer id; Text cmd, msg;
         Wait_on_widgets(id,cmd,msg);
 		if(cmd == "keystroke")		continue;
-		//if(cmd == "Panel About")	manage_about_panel();   //TODO - include file
+		if(cmd == "Panel About")	manage_about_panel();
 		if(cmd == "Panel Quit")		return (cmd);
 		if(cmd == "CodeShutdown")	Set_exit_code(cmd);
         for(i=1;i<=id_count;i++){

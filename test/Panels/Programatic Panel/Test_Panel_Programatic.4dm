@@ -1,4 +1,4 @@
-#include "mashy_lib_panel_handler_std.H"
+#include "mashy_lib_widgets_panel_handler_std.H"
 
 
 Text panel_command_parser(Text command, Integer flags){
