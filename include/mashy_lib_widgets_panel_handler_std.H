@@ -2,6 +2,7 @@
 #define mashy_lib_widgets_panel_handler_std_H_INCLUDED
 #include "12d/set_ups.h"
 #include "mashy_lib_about_panel.h"
+#include "mashy_lib_files.H"
 #define COMMAND_PARSER_NO_FLAGS 0 // use to echo the command only, good way to test command coverage
 #define COMMAND_PARSER_NO_EXECUTE 1 // use to echo the command only, good way to test command coverage
 
@@ -28,7 +29,11 @@ Integer include_check_for_panel_change(Text cmd, Text &new_panel_level){ // pane
 
 Text panel_command_parser(Text command, Integer flags); // PROTOTYPE ONLY, DEFINE COMMANDS IN SPECIFIC MACRO
 
-Text include_panel_now(Text &title, Integer &pos_x, Integer &pos_y, Text button_label[], Text button_command[], Integer size_b, 
+// TODO - need a way to left justify the buttons text
+
+// mode == 0, contol flows to panel_command_parser()
+// mode == 1, the selected buttons command is returned as text
+Text include_panel_now(Integer mode, Text &title, Integer &pos_x, Integer &pos_y, Text button_label[], Text button_command[], Integer size_b, 
                             Text standard_label[], Text standard_command[], Integer size_s, Integer n_columns, 
                             Integer button_x, Integer button_y){
     if( (pos_x == -1) || (pos_y == -1) ) Get_cursor_position(pos_x,pos_y);
@@ -53,35 +58,38 @@ Text include_panel_now(Text &title, Integer &pos_x, Integer &pos_y, Text button_
         Append(hg_bot[i],vg_all);
     }
     //TODO handle errors...
-    if( (size_b < 1) || (size_s < 1)){
+
+    Integer size_b_plus_s = size_b + size_s;
+    if( (size_b_plus_s < 1) ){ // dont allow the main list to have a zero size!
         Print("NUKED: due to array size less than 1\n");
         return "Panel Quit";
     }
-    Integer all_ids[size_b + size_s];
+    Integer all_ids[size_b_plus_s];
     Integer id_count = 0;
-
-    Button button_top[size_b];
     Integer hg_count = 0;
-    for(i=1;i<=size_b;i++){
-        button_top[i]=Create_button(button_label[i],button_command[i]);
-        Set_sizing_constraints(button_top[i],2,2);
-        if(((i-1)%n_columns == 0))hg_count++;
-        Append(button_top[i],hg_top[hg_count]); // hardcoded! - TODO
-        all_ids[++id_count] = Get_id(button_top[i]);
+    if(size_b > 0){
+        Button button_top[size_b];
+        hg_count = 0;
+        for(i=1;i<=size_b;i++){
+            button_top[i]=Create_button(button_label[i],button_command[i]);
+            Set_sizing_constraints(button_top[i],2,2);
+            if(((i-1)%n_columns == 0))hg_count++;
+            Append(button_top[i],hg_top[hg_count]); // hardcoded! - TODO
+            all_ids[++id_count] = Get_id(button_top[i]);
+        }
     }
 
-    Button button_bot[size_s];
-    hg_count = 0;
-    for(i=1;i<=size_s;i++){
-        button_bot[i]=Create_button(standard_label[i],standard_command[i]);
-        Set_sizing_constraints(button_bot[i],2,2);
-        if(((i-1)%n_columns == 0))hg_count++;
-        Append(button_bot[i],hg_bot[hg_count]); // hardcoded! - TODO
-        all_ids[++id_count] = Get_id(button_bot[i]);
+    if(size_s > 0){ 
+        Button button_bot[size_s];
+        hg_count = 0;
+        for(i=1;i<=size_s;i++){
+            button_bot[i]=Create_button(standard_label[i],standard_command[i]);
+            Set_sizing_constraints(button_bot[i],2,2);
+            if(((i-1)%n_columns == 0))hg_count++;
+            Append(button_bot[i],hg_bot[hg_count]); // hardcoded! - TODO
+            all_ids[++id_count] = Get_id(button_bot[i]);
+        }
     }
-
-    // Button hidden_button_top = Create_button("hidden top","hidden top");    // still need a way to best handle zero sized arrays coming in - TODO
-    // Button hidden_button_bot = Create_button("hidden top","hidden top");
 
     Show_widget(panel,pos_x,pos_y);
     Integer doit = 1;
@@ -99,13 +107,38 @@ Text include_panel_now(Text &title, Integer &pos_x, Integer &pos_y, Text button_
                 Get_widget_position(panel,pos_x,pos_y);
                 Text garbage;
                 if(include_check_for_panel_change(cmd,garbage))return cmd; // if changing panels just exit
-                return_text = panel_command_parser(cmd, flags);             // FLOW CONTROL RETURNS TO THE CUSTOM COMMAND PARSER IN THE MAIN MACRO
+                if(mode == 0){
+                    return_text = panel_command_parser(cmd, flags);             // FLOW CONTROL RETURNS TO THE CUSTOM COMMAND PARSER IN THE MAIN MACRO
+                }
+                if(mode ==1){
+                    return cmd;
+                }
                 break;
             }
         }
 
     }
     return return_text;
+}
+
+Text panel_display_list_get_reply(Text &title, Integer &pos_x, Integer &pos_y, Text button_label[], Integer size, Integer n_columns){
+    Text button_command[size];
+    Text dummy[1];
+    Integer button_x = 100,button_y=100;
+    Integer mode = 1; // this means the main function will just return the command (which we set from the button name)
+    for(Integer i=1;i<=size;i++) button_command[i] = button_label[i];
+    return include_panel_now(mode, title, pos_x, pos_y, button_label, button_command, size, 
+                            dummy, dummy, 0, n_columns, 
+                            button_x, button_y);
+}
+
+Text panel_display_list_get_reply(Text &title, Integer &pos_x, Integer &pos_y, Dynamic_Text &dt, Integer n_columns){
+  Integer size;
+  Get_number_of_items(dt,size);
+  if(size<1)return"";
+  Text button_label[size];
+  for(Integer i=1;i<=size;i++)  Get_item(dt,i,button_label[i]);
+  return panel_display_list_get_reply(title, pos_x, pos_y, button_label, size, n_columns);
 }
 
 void inlcude_parse_buttons(Text buttons[], Text button_name[], Text panel_level[], Text command[] , Integer s1){
@@ -170,10 +203,100 @@ void include_handle_custom_panel(Text title, Text buttons1[], Integer s1, Text b
             current_panel_level = ""; //reset the panel level
             continue;
         }
-        return_text = include_panel_now(title, pos_x, pos_y, this_buttons, this_commands, this_button_count, button_names2, button_commands2, n_buttons2, horizontal_button_columns, button_x, button_y);
+        Integer mode = 0;
+        return_text = include_panel_now(mode , title, pos_x, pos_y, this_buttons, this_commands, this_button_count, button_names2, button_commands2, n_buttons2, horizontal_button_columns, button_x, button_y);
         Text possible_new_panel_name;
         if(include_check_for_panel_change(return_text,possible_new_panel_name)) current_panel_level = possible_new_panel_name; // check to change panel level
     }while (return_text != "Panel Quit");
 }
+
+///////// SPEFICIC FUNCTIONS
+
+// START AUX
+void add_prefix_suffix(Dynamic_Text &dt, Text prefix, Text suffix){
+  Integer items;  Get_number_of_items(dt,items);
+  for(Integer i=1;i<=items;i++){
+    Text t; Get_item(dt,i,t); Set_item(dt,i,prefix+t+suffix);
+  }
+}
+
+Integer is_last_char(Text text_to_search, Integer c){
+  Integer last_c;
+  Get_char(text_to_search,Text_length(text_to_search),last_c);
+  return c == last_c ;
+}
+
+// END AUX
+
+Text panel_walk_dir(Text base, Text file_wildcard, Text quit_text_at_top_of_list, Integer &pos_x, Integer &pos_y){
+  // for a base path walk it
+  Text base_path = valid_path(base);
+  Dynamic_Text dirs = get_list_of_folders(base_path,"*") , files = get_list_of_files(base_path,file_wildcard);
+  add_prefix_suffix(dirs,"\\","\\");
+  Dynamic_Text list;
+  if(quit_text_at_top_of_list != ""){
+    Append(quit_text_at_top_of_list,list);
+    Append("",list);
+  } 
+  Append(files,list);
+  Append("",list);
+  Append("..\\",list);
+  Append(dirs,list);
+  //return menu_display_list_get_reply(list,file_wildcard,x,y);
+  Integer n_columns = 1;
+  Text title = "File walker";
+  return panel_display_list_get_reply(title, pos_x, pos_y, list, n_columns);
+}
+
+
+Text panel_get_file(Text base_path, Text file_wildcard, Integer exit_on_selection, Integer execute_on_selection){
+  Text base_in = valid_path(base_path);
+  Text base = base_in;
+  Text quit_text_at_top_of_list = " - Exit - ";
+  if(exit_on_selection) quit_text_at_top_of_list = ""; // the menu will handle this
+  Integer x=-1,y=-1;
+  Text reply;
+  do {
+     Text msg;
+     reply =   panel_walk_dir(base, file_wildcard, quit_text_at_top_of_list, x, y);
+     if(reply=="")continue;
+     if(reply=="Panel Quit")reply = quit_text_at_top_of_list;
+     if(is_last_char(reply,'\\')){
+      base = real_path(base + "\\" + reply);
+      msg = ", is a folder";
+      if( Text_length(base) <= Text_length(base_in) ){
+        base = base_in;
+      } 
+     }else{
+      msg = ", is a file";
+      if(execute_on_selection){
+        // handle filetypes here
+        msg += ", and will be executed";
+        Text this_file = valid_path(base+"\\"+reply);
+        if(File_exists(this_file)){
+          Text file_ext;
+          get_extension(reply,file_ext);
+          Print("("+file_ext+")\n");
+          if(Text_lower(file_ext) == "4do"){
+            Macro_Handle handle;
+            Integer run_now = 1;
+            //Create_macro("\""+this_file+"\"",run_now,handle); // Paul Hardwick email
+            Create_macro("-no_console -close_on_exit \""+this_file+"\"",run_now); 
+            //run_a_macro_via_chain (this_file);
+          }else{
+            run_system_command_no_wait("\""+this_file+"\"");
+          } 
+        }
+      }
+      if(exit_on_selection){
+        Print(reply+msg+"\n");
+        break;
+      }
+     }
+     Print(reply+msg+"\n");
+  } while(reply != quit_text_at_top_of_list);
+  return reply;
+}
+
 
 #endif

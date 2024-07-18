@@ -657,6 +657,17 @@ Integer get_list_of_files(Text base_path, Text wildcard, Integer files_or_folder
 	return items;
 }
 
+Dynamic_Text get_list_of_files(Text base_path, Text wildcard){
+  Dynamic_Text dt;
+  get_list_of_files(base_path, wildcard, 2, dt);
+  return dt;
+}
+
+Dynamic_Text get_list_of_folders(Text base_path, Text wildcard){
+  Dynamic_Text dt;
+  get_list_of_files(base_path, wildcard, 1, dt);
+  return dt;
+}
 
 // function that gets all files in a folder or all subfolders and
 // returns their names and number of files
