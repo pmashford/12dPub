@@ -59,6 +59,7 @@ echo %mycmd%
 
 rem SKIP ALL THIS IF THE MACRO FILENAME CONTAINS test, WE DONT WANT TO COPY THESE TO /bin/
 if not x%fileBase:test=%==x%fileBase% goto end
+if not x%fileBase:mashy_lib=%==x%fileBase% goto end
 
 echo. 
 echo updating macros 
