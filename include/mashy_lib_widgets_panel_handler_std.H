@@ -74,7 +74,7 @@ Text include_panel_now(Integer mode, Text &title, Integer &pos_x, Integer &pos_y
             button_top[i]=Create_button(button_label[i],button_command[i]);
             Set_sizing_constraints(button_top[i],2,2);
             if(((i-1)%n_columns == 0))hg_count++;
-            Append(button_top[i],hg_top[hg_count]); // hardcoded! - TODO
+            Append(button_top[i],hg_top[hg_count]); 
             all_ids[++id_count] = Get_id(button_top[i]);
         }
     }
@@ -86,7 +86,7 @@ Text include_panel_now(Integer mode, Text &title, Integer &pos_x, Integer &pos_y
             button_bot[i]=Create_button(standard_label[i],standard_command[i]);
             Set_sizing_constraints(button_bot[i],2,2);
             if(((i-1)%n_columns == 0))hg_count++;
-            Append(button_bot[i],hg_bot[hg_count]); // hardcoded! - TODO
+            Append(button_bot[i],hg_bot[hg_count]); 
             all_ids[++id_count] = Get_id(button_bot[i]);
         }
     }
@@ -97,6 +97,7 @@ Text include_panel_now(Integer mode, Text &title, Integer &pos_x, Integer &pos_y
     while (doit) {
         Integer id; Text cmd, msg;
         Wait_on_widgets(id,cmd,msg);
+        Print("id<"+To_text(id) +">, cmd<"+cmd+", msg<"+msg+">\n" );
 		if(cmd == "keystroke")		continue;
 		if(cmd == "Panel About")	manage_about_panel();
 		if(cmd == "Panel Quit")		return (cmd);
@@ -108,7 +109,7 @@ Text include_panel_now(Integer mode, Text &title, Integer &pos_x, Integer &pos_y
                 Text garbage;
                 if(include_check_for_panel_change(cmd,garbage))return cmd; // if changing panels just exit
                 if(mode == 0){
-                    return_text = panel_command_parser(cmd, flags);             // FLOW CONTROL RETURNS TO THE CUSTOM COMMAND PARSER IN THE MAIN MACRO
+                    return_text = panel_command_parser(cmd, flags);             // FLOW CONTROL GOES TO THE CUSTOM COMMAND PARSER IN THE MAIN MACRO
                 }
                 if(mode ==1){
                     return cmd;
@@ -144,7 +145,7 @@ Text panel_display_list_get_reply(Text &title, Integer &pos_x, Integer &pos_y, D
 void inlcude_parse_buttons(Text buttons[], Text button_name[], Text panel_level[], Text command[] , Integer s1){
     for(Integer i=1;i<=s1;i++){
         Dynamic_Text parts1;
-        From_text(buttons[i],'\"','\t',parts1); // split by tab ; TOOD - this should only split by first tab, more work to do later
+        From_text(buttons[i],'\"','\t',parts1); // split by tab ; TOOD - this should only split by first tab, for now means more work to do later within this function
         Text t;
         Get_item(parts1,1,t);
         Dynamic_Text parts2;
@@ -152,7 +153,7 @@ void inlcude_parse_buttons(Text buttons[], Text button_name[], Text panel_level[
         Integer n_parts1,n_parts2;
         Get_number_of_items(parts1,n_parts1);
         Get_number_of_items(parts2,n_parts2);
-        if(n_parts2>1){
+        if(n_parts2 > 1){
             for(Integer j=Text_length(t);j>0;j--){
                 Integer c;
                 Get_char(t,j,c);
@@ -168,31 +169,31 @@ void inlcude_parse_buttons(Text buttons[], Text button_name[], Text panel_level[
         }
         for(Integer j=2;j<=n_parts1;j++){ // rebuild the command into command[i]
             Get_item(parts1,j,t);
-            if(j>2)command[i]+="\t"; //TODO - this is inneficient from the first From_text();
+            if(j > 2)command[i]+="\t"; //TODO - this is inneficient from the first From_text();
             command[i]+=t;
         }
     }
 }
 
-void include_handle_custom_panel(Text title, Text buttons1[], Integer s1, Text buttons2[], Integer n_buttons2, Integer horizontal_button_columns, Integer button_x, Integer button_y){
-    Text panel_level[s1];
-    Text button_name[s1];
-    Text command[s1];
-    inlcude_parse_buttons(buttons1,button_name,panel_level,command,s1);
+void handle_custom_panel(Text title, Text buttons_top[], Integer n_buttons_top, Text buttons_bot[], Integer n_buttons_bot, Integer n_button_columns, Integer button_x, Integer button_y){
+    Text panel_level[n_buttons_top];
+    Text button_name[n_buttons_top];
+    Text command[n_buttons_top];
+    inlcude_parse_buttons(buttons_top,button_name,panel_level,command,n_buttons_top);
 
-    Text button_names2[n_buttons2];
-    Text panel_levels2[n_buttons2]; // not used
-    Text button_commands2[n_buttons2];
-    inlcude_parse_buttons(buttons2,button_names2,panel_levels2,button_commands2,n_buttons2);
+    Text button_names2[n_buttons_bot];
+    Text panel_levels2[n_buttons_bot]; // not used
+    Text button_commands2[n_buttons_bot];
+    inlcude_parse_buttons(buttons_bot,button_names2,panel_levels2,button_commands2,n_buttons_bot);
 
     Integer pos_x=-1,pos_y=-1;
     Text current_panel_level = "";
     Text return_text="";
     do {
-        Text this_buttons[s1];
-        Text this_commands[s1];
+        Text this_buttons[n_buttons_top];
+        Text this_commands[n_buttons_top];
         Integer this_button_count = 0;
-        for(Integer i=1;i<=s1;i++){
+        for(Integer i=1;i<=n_buttons_top;i++){
             if(panel_level[i] == current_panel_level){
                 this_button_count++;
                 this_buttons[this_button_count] = button_name[i];
@@ -204,10 +205,26 @@ void include_handle_custom_panel(Text title, Text buttons1[], Integer s1, Text b
             continue;
         }
         Integer mode = 0;
-        return_text = include_panel_now(mode , title, pos_x, pos_y, this_buttons, this_commands, this_button_count, button_names2, button_commands2, n_buttons2, horizontal_button_columns, button_x, button_y);
+        return_text = include_panel_now(mode , title, pos_x, pos_y, this_buttons, this_commands, this_button_count, button_names2, button_commands2, n_buttons_bot, n_button_columns, button_x, button_y);
         Text possible_new_panel_name;
         if(include_check_for_panel_change(return_text,possible_new_panel_name)) current_panel_level = possible_new_panel_name; // check to change panel level
     }while (return_text != "Panel Quit");
+}
+
+void handle_custom_panel(Text title, Dynamic_Text buttons_top_as_dt, Dynamic_Text buttons_bot_as_dt, Integer n_button_columns, Integer button_x, Integer button_y){
+    Integer n_buttons_top,n_buttons_bot;
+    Get_number_of_items(buttons_top_as_dt,n_buttons_top);
+    Get_number_of_items(buttons_bot_as_dt,n_buttons_bot);
+    Integer ierr_n_buttons_top = 0 , ierr_n_buttons_bot = 0;
+    if(n_buttons_top<1){ ierr_n_buttons_top = 1;  n_buttons_top = 1;  } // guard
+    if(n_buttons_bot<1){ ierr_n_buttons_bot = 1;  n_buttons_bot = 1;  } // guard
+    Text buttons_top[n_buttons_top];
+    Text buttons_bot[n_buttons_bot];
+    for(Integer i=1;i<=n_buttons_top;i++)   Get_item(buttons_top_as_dt,i,buttons_top[i]);
+    for(        i=1;i<=n_buttons_bot;i++)   Get_item(buttons_bot_as_dt,i,buttons_bot[i]);
+    if(ierr_n_buttons_top)buttons_top[1]="";
+    if(ierr_n_buttons_bot)buttons_bot[1]="";
+    return handle_custom_panel(title, buttons_top, n_buttons_top, buttons_bot, n_buttons_bot, n_button_columns, button_x, button_y);
 }
 
 ///////// SPEFICIC FUNCTIONS
@@ -248,7 +265,7 @@ Text panel_walk_dir(Text base, Text file_wildcard, Text quit_text_at_top_of_list
   return panel_display_list_get_reply(title, pos_x, pos_y, list, n_columns);
 }
 
-
+// this will return a selected file name, but there are options to run it and also keep the panel open
 Text panel_get_file(Text base_path, Text file_wildcard, Integer exit_on_selection, Integer execute_on_selection){
   Text base_in = valid_path(base_path);
   Text base = base_in;
@@ -298,5 +315,14 @@ Text panel_get_file(Text base_path, Text file_wildcard, Integer exit_on_selectio
   return reply;
 }
 
+// this will return the handle to a tin, null handle means the panel was exited (or the tin was deleted before a tin was selected)
+Tin panel_get_tin_all_types(){
+    Dynamic_Text list;
+    Get_project_tins(list); // TODO - sorted?
+    Integer pos_x=-1,pos_y=-1,n_columns=1;
+    Text title = "Select a tin";
+    Text reply = panel_display_list_get_reply(title, pos_x, pos_y, list, n_columns);
+    return Get_tin(reply); // try and reply with a handle to the tin, it'll be null if not found
+}
 
 #endif
