@@ -22,14 +22,14 @@ for %%I in ("!fullpath!") do (
 	set "fileBaseExt=%%~nxI"
 )
 
-set "repobin=!repohome!\bin"
+set "repoBin=!repohome!\bin"
 
 echo fullpath : %fullpath%
 echo filePath : %filePath%
 echo fileBase : %fileBase%
 echo fileBaseExt : %fileBaseExt%
 echo fileTarget : %fileTarget%
-echo repobin : %repobin%
+echo repoBin : %repoBin%
 echo filePathRelative : %filePathRelative%
 
 if exist "C:\Program Files\12d\12dmodel\15.00\nt.x64\12d.exe" set where=C:\Program Files\12d\12dmodel\15.00\nt.x64
@@ -57,14 +57,17 @@ set mycmd="%where%\cc4d.exe" "%fullpath%" -allow_old_calls -D"QUOTED_CC4D_VERSIO
 %mycmd%
 echo %mycmd%
 
+rem SKIP ALL THIS IF THE MACRO FILENAME CONTAINS test, WE DONT WANT TO COPY THESE TO /bin/
+if not x%fileBase:test=%==x%fileBase% goto end
+
 echo. 
 echo updating macros 
 echo. 
 
-copy "%filePath%\%fileBase%.4do" "%repobin%"
-copy "%filePath%\%fileBase%.4do" "%repobin%\_macro_hot_off_the_press.4do"
+copy "%filePath%\%fileBase%.4do" "%repoBin%"
+copy "%filePath%\%fileBase%.4do" "%repoBin%\_macro_hot_off_the_press.4do"
 
-set "infofile=%repobin%\%fileBase%.json"
+set "infofile=%repoBin%\%fileBase%.json"
 echo { > "%infofile%"
 echo "file": "%fileBase%.4do", >> "%infofile%"
 echo "compileDate": "%date:~-10%" , >> "%infofile%"
@@ -74,6 +77,8 @@ echo "sourceDirname": "%filePathRelative:\=/%", >> "%infofile%"
 echo "compiler": "%where:\=/%/cc4d.exe", >> "%infofile%"
 echo "compilerInfo": "%QUOTED_CC4D_VERSION_DATA:\=/%" >> "%infofile%"
 echo } >> "%infofile%"
+
+:end
 
 ECHO "=========================================================" 
 ECHO " COMPILER RESULTS 
