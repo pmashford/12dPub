@@ -97,8 +97,9 @@ void test_custom_panel(){
     add_cmd(buttons_bot,"Home",   "Panel");              // get to the home panel by simply having a panel command with no args
     // add_cmd(buttons_bot,"About",  "Panel About");
     add_cmd(buttons_bot,"Hide",  "Panel Hide");
+    Integer autohide_tick_state = 0; // -1 / 0 / 1 = disable, initial state off, initial state on
 
-    handle_custom_panel(title, buttons_top, buttons_bot, n_columns, button_x, button_y);
+    handle_custom_panel(title, buttons_top, buttons_bot, n_columns, autohide_tick_state, button_x, button_y);
 }
 
 
