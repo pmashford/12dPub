@@ -7,9 +7,9 @@
 
 /* this is the newer method, used in this implementation
 3 x Integer to 16 characters
-bits |666662|466664|266666|
-name |   a  |   b  |   c  |
-chars|ccccc|c|cccc|c|ccccc|
+bits |666662|466664|266666| (number of bits per character)
+name |   a  |   b  |   c  | (a,b,c are integers)
+chars|ccccc|c|cccc|c|ccccc| (16 characters)
 
 shifts
 26  20  14  08  02
@@ -49,7 +49,6 @@ Integer b64_to_i32_3(Text t, Integer &a, Integer &b, Integer &c){ // used to dec
 }
 
 // >> take Dynamic_Text and write a file to the filesystem
-
 Integer write_binary_file_from_4dm_code_dynamic_text_function(Text new_binary_filename_with_ext, Dynamic_Text &dt, Integer do_overwrite){ //this will take hex data stored in dt and write to a file
 	if(!do_overwrite && File_exists(new_binary_filename_with_ext)){
 		Print("write_binary_file_from_4dm_code_dynamic_text_function() failed to process on the basis of fucnction argument to NOT OVERWRITE EXISTING BINARY FILE ("+new_binary_filename_with_ext+"), FILE EXISTS!\n");
@@ -90,7 +89,6 @@ Integer write_binary_file_from_4dm_code_dynamic_text_function(Text new_binary_fi
 }
 
 // >> take a file from the filesystem and store/encode it as Dynamic_Text
-
 Integer read_binary_file_to_4dm_code_dynamic_text_function(Text file_name_in, Text file_name_out, Text binary_data_function_name){  // this will read a file in binary mode and convert to a custom text string... the new file has a function that retrieves the text string as Dynamic_Text
 	Integer ok=0;
 	File fin;
@@ -151,5 +149,127 @@ Integer read_binary_file_to_4dm_code_dynamic_text_function(Text file_name_in, Te
 	return(ok);
 }
 
+
+Integer append_binary_file_to_4dm_file_with_function_name(Text file_name_in, File &fout, Text binary_data_function_name){  // this will read a file in binary mode and convert to a custom text string... the new file has a function that retrieves the text string as Dynamic_Text
+	Integer ok=0;
+	File fin;
+	ok+=File_open(file_name_in,"rb",fin);
+
+	// File fout;
+	// ok+=File_open(file_name_out,"w",fout);
+	ok+=File_write_line(fout, "Dynamic_Text "+binary_data_function_name+"(){");
+	ok+=File_write_line(fout, "\tDynamic_Text dt;");
+
+	Integer count = 0;
+	Integer ierr = 0;
+	Text stream = "";
+	while(!ierr){
+		Integer a,b,c;
+        ierr=0;
+		if(File_read(fin,a))ierr++;
+        if(File_read(fin,b))ierr++;
+        if(File_read(fin,c))ierr++;
+        Text data=i32_3_to_b64(a,b,c); // always get the stream
+		if (ierr){
+			// Print("ONCE?");Print(ierr);Print(); // this should only ever be hit once
+            count = INTEGER_SETS_PER_LINE_OF_TEXT; // this means we'll force data to be written
+            switch (ierr){
+                case 3 :{ // all reads failed
+                    data = "";
+                }break;
+                case 2 :{ // b and c failed
+                    data = Get_subtext(data,1,6) + "==========";
+                }break;
+                case 1 :{ // c failed
+                    data = Get_subtext(data,1,11) + "=====";
+                }break;
+            }
+		}
+		count++;
+        stream+=data;
+		if(count>=INTEGER_SETS_PER_LINE_OF_TEXT){
+			File_write_line(fout, "\tAppend(\""+stream+"\",dt);");
+			stream = "";
+			count=0;
+		}
+	}
+
+	Text footer =	"\treturn (dt);"
+			+"\n"+	"}"
+            ;
+	ok+=File_write_line(fout,footer);
+	ok+=File_close(fin);
+	// ok+=File_close(fout);
+	return(ok);
+}
+
+// TODO - alot nicer if this was packed
+void write_unpack_footer(File &fout ){
+    File_write_line(fout,"Integer a_to_i(Text t){"
+			+"\n"+	"return Find_text(\"BCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_\",t);"
+			+"\n"+	"}"
+			+"\n"+	"Integer b64_to_i32_3(Text t, Integer &a, Integer &b, Integer &c){ // used to decode (t) to (3 x 32bit ints), expects t to be 16 characters, where each character is in the range of 0-@"
+			+"\n"+	"a = (a_to_i(Get_subtext(t,1,1)) << 26) | (a_to_i(Get_subtext(t,2,2)) << 20) | (a_to_i(Get_subtext(t,3,3)) << 14) | (a_to_i(Get_subtext(t,4,4)) << 8) | (a_to_i(Get_subtext(t,5,5)) << 2) | (a_to_i(Get_subtext(t,6,6) ) >> 4 )  ;"
+			+"\n"+	"b = ( a_to_i(Get_subtext(t,6,6)) << 28) | (a_to_i(Get_subtext(t,7,7)) << 22) | (a_to_i(Get_subtext(t,8,8)) << 16) | (a_to_i(Get_subtext(t,9,9)) << 10) | (a_to_i(Get_subtext(t,10,10)) << 4) | (a_to_i(Get_subtext(t,11,11) ) >> 2 )  ;"
+			+"\n"+	"c = (a_to_i(Get_subtext(t,11,11)) << 30) | (a_to_i(Get_subtext(t,12,12)) << 24) | (a_to_i(Get_subtext(t,13,13)) << 18) | (a_to_i(Get_subtext(t,14,14)) << 12) | (a_to_i(Get_subtext(t,15,15)) << 6) | (a_to_i(Get_subtext(t,16,16)) )  ;"
+			+"\n"+	"if (Get_subtext(t,7,7) == \"=\") return 1; // EOF at B"
+			+"\n"+	"if (Get_subtext(t,12,12) == \"=\") return 2; // EOF at C"
+			+"\n"+	"return 0;"
+			+"\n"+	"}"
+			+"\n"+	"Integer write_binary_file_from_4dm_code_dynamic_text_function(Text new_binary_filename_with_ext, Dynamic_Text &dt, Integer do_overwrite){ //this will take hex data stored in dt and write to a file"
+			+"\n"+	"if(!do_overwrite && File_exists(new_binary_filename_with_ext)){"
+			+"\n"+	"Print(-123456);Print();"
+			+"\n"+	"}else{"
+			+"\n"+	"Integer items;"
+			+"\n"+	"Get_number_of_items(dt,items);"
+			+"\n"+	"if(items){"
+			+"\n"+	"Integer ok=0;"
+			+"\n"+	"File f;"
+			+"\n"+	"ok+=File_open(new_binary_filename_with_ext,\"wb\",f);"
+			+"\n"+	"for(Integer i=1;i<=items;i++){"
+			+"\n"+	"Text t;"
+			+"\n"+	"Get_item(dt,i,t);"
+			+"\n"+	"Integer size = Text_length(t);"
+			+"\n"+	"Integer c = 16;"
+			+"\n"+	"while (c <= size){"
+			+"\n"+	"Integer A,B,C;"
+			+"\n"+	"Integer eof = b64_to_i32_3(Get_subtext(t,c-15,c), A, B, C);"
+			+"\n"+	"switch (eof) {"
+			+"\n"+	"case (0):{"
+			+"\n"+	"File_write(f,A);    File_write(f,B);    File_write(f,C);"
+			+"\n"+	"}break;"
+			+"\n"+	"case (1):{"
+			+"\n"+	"File_write(f,A);    File_write(f,B);"
+			+"\n"+	"}break;"
+			+"\n"+	"case (2):{"
+			+"\n"+	"File_write(f,A);"
+			+"\n"+	"}break;"
+			+"\n"+	"}"
+			+"\n"+	"c+=16;"
+			+"\n"+	"}"
+			+"\n"+	"}"
+			+"\n"+	"ok+=File_close(f);"
+			+"\n"+	"return(ok);"
+			+"\n"+	"}"
+			+"\n"+	"}"
+			+"\n"+	"return(1);"
+			+"\n"+	"}"
+			+"\n"+	"Text get_filename(){Text data;	Get_temporary_project_directory(data);return (data+\"/selected.4do\");}"
+			+"\n"+	"void main(){"
+			+"\n"+	"switch (Get_program_version_number()) {"
+			+"\n"+	"case (14):{"
+			+"\n"+	"Print(14);Print();"
+			+"\n"+	"write_binary_file_from_4dm_code_dynamic_text_function(get_filename(), datav14(), 1);"
+			+"\n"+	"}break;"
+			+"\n"+	"case (15):{"
+			+"\n"+	"Print(15);Print();"
+			+"\n"+	"write_binary_file_from_4dm_code_dynamic_text_function(get_filename(), datav15(), 1);"
+			+"\n"+	"}break;"
+			+"\n"+	"}"
+			+"\n"+	"Create_macro(\"-no_console -close_on_exit \\\"\"+get_filename()+\"\\\"\",1); "
+			+"\n"+	"Sleep(50);"
+			+"\n"+	"File_delete(get_filename());"
+			+"\n"+	"}");
+}
 
 #endif

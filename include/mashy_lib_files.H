@@ -14,6 +14,15 @@ Integer resolve_env(Text source, Text &output);
 	#define CREATE_NO_WINDOW 0x08000000
 #endif
 
+void echo(Text filename){
+    if(!File_exists(filename)) return;
+    File f;
+    File_open(filename,"r",f);
+    Text t, u;
+    while(!File_read_line(f,u)) t+="\n"+u;
+    File_close(f);
+    Print(t+"\n");
+}
 
 Integer get_list_of_files_incl_search_of_subfolders(Text base_path_no_slash , Text wildcard, Dynamic_Text &file_names_full_path){
     Text cmd_call = "  /ON   /b /a-d /s"; // a == attributes, -d == no directories
@@ -265,6 +274,17 @@ Integer get_file_path_filename(Text full_path,Text &path, Text &file){
 		return(0); //success
 	}
 	return(-1);//bad
+}
+
+Text get_parent(Text full_path){
+	Dynamic_Text parts;
+	Integer i = get_file_path_parts(full_path,parts);
+	if(i>1){
+		Text t;
+		Get_item(parts,i-1,t); //this is the parent
+		return t;
+	}
+	return(".");//bad
 }
 
 Integer get_extension(Text any_path, Text &extension){
