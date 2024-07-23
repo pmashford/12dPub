@@ -68,10 +68,17 @@ Text include_panel_now(Integer mode, Text title, Integer &pos_x, Integer &pos_y,
     Horizontal_Group hg_top[n_hg_top];
     Horizontal_Group hg_bot[n_hg_bot];
 
+    Draw_Box top_box_size_hack[n_hg_top];
+    Draw_Box bot_box_size_hack[n_hg_top];
+    Integer box_size_hack_min_height = 70;
+
     for(Integer i=1;i<=n_hg_top;i++){
         hg_top[i] = Create_horizontal_group(ALL_WIDGETS_OWN_WIDTH);
         Set_sizing_constraints(hg_top[i],2,2);
         Append(hg_top[i],vg_all);
+        top_box_size_hack[i] = Create_draw_box(0,box_size_hack_min_height,0);
+        Append(top_box_size_hack[i],hg_top[i]);
+        
     }
     Horizontal_Group hg_autohide = Create_horizontal_group(COMPRESS_WIDGETS_OVER_WIDTH); // ALL_WIDGETS_OWN_WIDTH
     Named_Tick_Box autohide_tick_box= Create_named_tick_box("Auto Hide",autohide_tick_state,"toggle autohide");   // TODO - remember state... it should be passed into the function... maybe 3 modes. 0= off, 1 = on, -ve dont expose?
@@ -86,6 +93,8 @@ Text include_panel_now(Integer mode, Text title, Integer &pos_x, Integer &pos_y,
         hg_bot[i] = Create_horizontal_group(ALL_WIDGETS_OWN_WIDTH);
         Set_sizing_constraints(hg_bot[i],2,2);
         Append(hg_bot[i],vg_bot);
+        bot_box_size_hack[i] = Create_draw_box(0,box_size_hack_min_height,0);
+        Append(bot_box_size_hack[i],hg_bot[i]);
     }
     Append(vg_bot,vg_all);
 

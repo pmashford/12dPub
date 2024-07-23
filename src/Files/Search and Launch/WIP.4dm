@@ -2,7 +2,7 @@
 #ifndef	CREATE_NO_WINDOW
 	#define CREATE_NO_WINDOW 0x08000000
 #endif
-
+d
 // days old - +ve means not older than, -ve means older than
 Dynamic_Text get_files(Text basepath, Text wildcard, Integer is_recursive, Integer days_old){
 	Text dir_name; Get_temporary_project_directory(dir_name);
