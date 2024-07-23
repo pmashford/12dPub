@@ -41,7 +41,7 @@ void test_custom_panel(){
     Text title = "12d Tools Tribute";
     Integer n_columns = 3;
     Dynamic_Text buttons_top;
-    Integer button_x = 12, button_y = 30;  // TODO - button_y NOT YET IMPLEMENTED, -1 for button_x means the panel will decide what to do
+    Integer button_width = 12, button_height = 60;  // button_width of 0 means panel will work it out |  button_height about 60 seems OK for phat buttons
     add_cmd(buttons_top,"Inquire/Measure...",       "Panel\tInquire/Measure");    // format is -> "TEXT\tCMD\tARG1\tARG2"
     add_cmd(buttons_top,"Create/Edit Points...",    "Panel\tCreate/Edit Points");
     add_cmd(buttons_top,"Menu Panels...",           "Panel\tMenu Panels");
@@ -99,7 +99,7 @@ void test_custom_panel(){
     add_cmd(buttons_bot,"Hide",  "Panel Hide");
     Integer autohide_tick_state = 0; // -1 / 0 / 1 = disable, initial state off, initial state on
 
-    handle_custom_panel(title, buttons_top, buttons_bot, n_columns, autohide_tick_state, button_x, button_y);
+    handle_custom_panel(title, buttons_top, buttons_bot, n_columns, autohide_tick_state, button_width, button_height);
 }
 
 

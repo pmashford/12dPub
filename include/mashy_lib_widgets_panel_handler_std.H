@@ -54,7 +54,7 @@ Text panel_command_parser(Text command, Integer flags); // PROTOTYPE ONLY, DEFIN
 // mode == 1, the selected buttons command is returned as text
 Text include_panel_now(Integer mode, Text title, Integer &pos_x, Integer &pos_y, Text button_label[], Text button_command[], Integer size_b, 
                             Text standard_label[], Text standard_command[], Integer size_s, Integer n_columns, Integer &autohide_tick_state, 
-                            Integer button_x, Integer button_y){
+                            Integer button_width, Integer button_height){
     if( (pos_x == -1) || (pos_y == -1) ) Get_cursor_position(pos_x,pos_y);
     Text return_text="";
     Panel panel = Create_panel(title,1); // TODO - resize
@@ -70,7 +70,7 @@ Text include_panel_now(Integer mode, Text title, Integer &pos_x, Integer &pos_y,
 
     Draw_Box top_box_size_hack[n_hg_top];
     Draw_Box bot_box_size_hack[n_hg_top];
-    Integer box_size_hack_min_height = 70;
+    Integer box_size_hack_min_height = button_height;
 
     for(Integer i=1;i<=n_hg_top;i++){
         hg_top[i] = Create_horizontal_group(ALL_WIDGETS_OWN_WIDTH);
@@ -112,7 +112,7 @@ Text include_panel_now(Integer mode, Text title, Integer &pos_x, Integer &pos_y,
         for(i=1;i<=size_b;i++){
             button_top[i]=Create_button(button_label[i],button_command[i]);
             Set_sizing_constraints(button_top[i],2,2);
-            if(button_x>0)  Set_width_in_chars(button_top[i],button_x);
+            if(button_width>0)  Set_width_in_chars(button_top[i],button_width);
             if(((i-1)%n_columns == 0))hg_count++;
             Append(button_top[i],hg_top[hg_count]); 
             all_ids[++id_count] = Get_id(button_top[i]);
@@ -125,7 +125,7 @@ Text include_panel_now(Integer mode, Text title, Integer &pos_x, Integer &pos_y,
         for(i=1;i<=size_s;i++){
             button_bot[i]=Create_button(standard_label[i],standard_command[i]);
             Set_sizing_constraints(button_bot[i],2,2);
-            if(button_x>0)  Set_width_in_chars(button_bot[i],button_x);
+            if(button_width>0)  Set_width_in_chars(button_bot[i],button_width);
             if(((i-1)%n_columns == 0))hg_count++;
             Append(button_bot[i],hg_bot[hg_count]); 
             all_ids[++id_count] = Get_id(button_bot[i]);
@@ -174,13 +174,13 @@ Text include_panel_now(Integer mode, Text title, Integer &pos_x, Integer &pos_y,
 Text panel_display_list_get_reply(Text title, Integer &pos_x, Integer &pos_y, Text button_label[], Integer size, Integer n_columns){
     Text button_command[size];
     Text dummy[1];
-    Integer button_x = -1,button_y=20;  // TODO - do a sweep of the commands and check if it makes sense to set a width, -1 for now should let the widgets decide what to do
+    Integer button_width = -1,button_height=20;  // TODO - do a sweep of the commands and check if it makes sense to set a width, -1 for now should let the widgets decide what to do
     Integer mode = 1; // this means the main function handling the panel will just return the command (we set the command here to be the button name)
     Integer autohide_tick_state = -1;
     for(Integer i=1;i<=size;i++) button_command[i] = button_label[i];
     return include_panel_now(mode, title, pos_x, pos_y, button_label, button_command, size, 
                             dummy, dummy, 0, n_columns, autohide_tick_state,
-                            button_x, button_y);
+                            button_width, button_height);
 }
 
 Text panel_display_list_get_reply(Text title, Integer &pos_x, Integer &pos_y, Dynamic_Text &dt, Integer n_columns){
@@ -225,7 +225,7 @@ void inlcude_parse_buttons(Text buttons[], Text button_name[], Text panel_level[
     }
 }
 
-void handle_custom_panel(Text title, Text buttons_top[], Integer n_buttons_top, Text buttons_bot[], Integer n_buttons_bot, Integer n_button_columns, Integer &autohide_tick_state, Integer button_x, Integer button_y){
+void handle_custom_panel(Text title, Text buttons_top[], Integer n_buttons_top, Text buttons_bot[], Integer n_buttons_bot, Integer n_button_columns, Integer &autohide_tick_state, Integer button_width, Integer button_height){
     Text panel_level[n_buttons_top];
     Text button_name[n_buttons_top];
     Text command[n_buttons_top];
@@ -257,14 +257,14 @@ void handle_custom_panel(Text title, Text buttons_top[], Integer n_buttons_top, 
             continue;
         }
         Integer mode = 0;
-        return_text = include_panel_now(mode , child_title, pos_x, pos_y, this_buttons, this_commands, this_button_count, button_names2, button_commands2, n_buttons_bot, n_button_columns, autohide_tick_state, button_x, button_y);
+        return_text = include_panel_now(mode , child_title, pos_x, pos_y, this_buttons, this_commands, this_button_count, button_names2, button_commands2, n_buttons_bot, n_button_columns, autohide_tick_state, button_width, button_height);
         if(return_text == "Panel Hide") include_panel_hide();   // hide it?
         Text possible_new_panel_name;
         if(include_check_for_panel_change(return_text,possible_new_panel_name)) current_panel_level = possible_new_panel_name; // check to change panel level
     }while (return_text != "Panel Quit");
 }
 
-void handle_custom_panel(Text title, Dynamic_Text buttons_top_as_dt, Dynamic_Text buttons_bot_as_dt, Integer n_button_columns, Integer &autohide_tick_state, Integer button_x, Integer button_y){
+void handle_custom_panel(Text title, Dynamic_Text buttons_top_as_dt, Dynamic_Text buttons_bot_as_dt, Integer n_button_columns, Integer &autohide_tick_state, Integer button_width, Integer button_height){
     Integer n_buttons_top,n_buttons_bot;
     Get_number_of_items(buttons_top_as_dt,n_buttons_top);
     Get_number_of_items(buttons_bot_as_dt,n_buttons_bot);
@@ -277,7 +277,7 @@ void handle_custom_panel(Text title, Dynamic_Text buttons_top_as_dt, Dynamic_Tex
     for(        i=1;i<=n_buttons_bot;i++)   Get_item(buttons_bot_as_dt,i,buttons_bot[i]);
     if(ierr_n_buttons_top)buttons_top[1]="";
     if(ierr_n_buttons_bot)buttons_bot[1]="";
-    return handle_custom_panel(title, buttons_top, n_buttons_top, buttons_bot, n_buttons_bot, n_button_columns, autohide_tick_state, button_x, button_y);
+    return handle_custom_panel(title, buttons_top, n_buttons_top, buttons_bot, n_buttons_bot, n_button_columns, autohide_tick_state, button_width, button_height);
 }
 
 ///////// SPEFICIC FUNCTIONS
