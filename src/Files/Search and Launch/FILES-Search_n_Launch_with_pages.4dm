@@ -6,13 +6,15 @@
 #include "12d/set_ups.h"
 #include "mashy_lib_widgets_panel_handler_std.H"
 
-// TODO - Reveal in explorer ?
+// NOTE
+// (counts[tab]defaults[tab]page1...)
 // TODO - properly plumb in special characters \t ; :
 // TODO - Sort by date? ... Text command = "forfiles /P \"" + basepath + "\"" + slash_s + wildcard + slash_d + " /C \"cmd /c if @isdir==FALSE echo @path >> " + quotes_add(rpt_file) ;
-// TODO - blow aways settings if they somehow get in a dodgey state
+// TODO - blow aways settings if they somehow get in a dodgey state (partially done on new pages page)
 // TODO - show OPW ?
-// TODO - date
-// TODO - Pages listed on a new list using cutom_panel() to  [ page ] [ delete] [ Reveal ] | [ add ] | [ copy ]
+// TODO - do HIDE ?
+// TODO - [ Reveal ] | [ copy /?]
+// TODO - reserve first position in the settings string for future... 1st position should hold panel height as a setting-> (settings[tab]counts[tab]defaults[tab]page1...)
 
 
 Dynamic_Text get_files(Text basepath, Text wildcard, Integer is_recursive){
