@@ -686,17 +686,29 @@ Integer match_name(Dynamic_Text &dt, Text pat, Dynamic_Text &dtr){
 }
 
 Integer get_max_number_of_chars(Dynamic_Text &dt){
-	Integer chars = 0;
+	Integer max_chars = 0;
 	Integer items;	Get_number_of_items(dt,items);
 	for(Integer i = 1 ; i <= items ; i++){
 		Text t;
 		Get_item(dt,i,t);
 		Integer test = Text_length(t);
-		if(test>chars){
-			chars = test;
+		if(test>max_chars){
+			max_chars = test;
 		}
 	}
-	return chars;
+	return max_chars;
+}
+
+Integer get_max_number_of_chars(Text t[], Integer size){
+	Integer max_chars = 0;
+	//Integer items;	Get_number_of_items(dt,items);
+	for(Integer i = 1 ; i <= size ; i++){
+		Integer test = Text_length(t[i]);
+		if(test>max_chars){
+			max_chars = test;
+		}
+	}
+	return max_chars;
 }
 
 

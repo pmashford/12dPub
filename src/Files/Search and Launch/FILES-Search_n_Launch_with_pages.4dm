@@ -2,7 +2,9 @@
 #include "mashy_lib_files.H"
 #include "mashy_lib_panel_defaults.H"
 #include "mashy_lib_about_panel.H"
+#include "mashy_lib_text_functions.H"
 #include "12d/set_ups.h"
+#include "mashy_lib_widgets_panel_handler_std.H"
 
 // TODO - Reveal in explorer ?
 // TODO - properly plumb in special characters \t ; :
@@ -10,6 +12,7 @@
 // TODO - blow aways settings if they somehow get in a dodgey state
 // TODO - show OPW ?
 // TODO - date
+// TODO - Pages listed on a new list using cutom_panel() to  [ page ] [ delete] [ Reveal ] | [ add ] | [ copy ]
 
 
 Dynamic_Text get_files(Text basepath, Text wildcard, Integer is_recursive){
@@ -205,6 +208,25 @@ Text get_page(Text data, Integer active_set){
     return get_item(list,active_set+2);
 }
 
+Text get_default(Text data){
+    Dynamic_Text list = get_words(data);
+    return get_item(list,2);
+}
+
+Text add_page(Text data){       // this will add a page to the end, based on whatever the default page is, the counts are set to the new page
+    Integer active_set,n_sets;
+    get_counts(data, active_set, n_sets);
+    n_sets++;
+    active_set = n_sets;
+    data+="\t"+ get_default(data);
+    return set_counts(data,active_set,n_sets);
+}
+
+Text reset_pages_from_default(Text data){
+    Text default_page = get_default( data);
+    return "1;1\t"+default_page+"\t"+default_page;
+}
+
 Text remove_page(Text data, Integer page_to_remove){
     Integer active_set,n_sets;
     get_counts(data, active_set, n_sets);
@@ -217,9 +239,10 @@ Text remove_page(Text data, Integer page_to_remove){
         if(i-2 == page_to_remove)continue;
         data+="\t" + get_item(list,i);
     }
-    active_set--;
-    set_counts(data, active_set, n_sets);
-    return data;
+    n_sets--;
+    if(active_set>n_sets)active_set=n_sets;
+
+    return set_counts(data, active_set, n_sets);
 }
 
 Text set_page(Text data, Integer active_set, Text page){
@@ -259,6 +282,7 @@ Text set_part(Text data, Integer active_set, Integer idx, Text value){
     return set_page(data,active_set,page);
 }
 
+
 Integer to_int(Text t){
     Integer i;
     From_text(t,i);
@@ -266,9 +290,9 @@ Integer to_int(Text t){
 }
 /// /// /// /// /// /// /// /// /// panel helpers
 
-Text get_basepath(Text data, Integer active_set)              {
-        return get_part(get_page(data,active_set), 1);
-         }            // returns the field
+
+
+Text get_basepath(Text data, Integer active_set)              {     return get_part(get_page(data,active_set), 1);}            // returns the field
 Text set_basepath(Text data, Integer active_set, Text value)  {    return set_part(data,active_set,           1,value);      }  // returns the whole data structure with the field updated
 Text get_wildcard(Text data, Integer active_set)              {    return get_part(get_page(data,active_set), 2);  }
 Text set_wildcard(Text data, Integer active_set, Text value)  {    return set_part(data,active_set,           2,value);      }
@@ -280,7 +304,85 @@ Integer get_recursive(Text data, Integer active_set)              {    return to
 Text    set_recursive(Text data, Integer active_set, Integer value)  {    return set_part(data,active_set,                 5,To_text(value));      }
 
 /// /// /// /// /// /// /// /// /// 
+{Text horrible_hack;}
 
+Text panel_command_parser(Text command, Integer flags){
+// flags might be a way of testing that a command is executable without actually executing
+    //Print(command+"\n");
+    Text return_text = "";
+    Text this_command, this_command_balance_right_after_tab;
+    include_split_by_tab(command, this_command, this_command_balance_right_after_tab);
+
+    Integer active_set,n_sets;
+    get_counts(horrible_hack, active_set, n_sets); // this could be used by multiple
+
+    switch (Text_lower(this_command)){
+        case ("continue") :{
+            Print("continue\n"); // DEBUG - TODO - REMOVE
+        }break;
+
+        case ("active") :{
+            Text idx_t; Integer idx;    From_text(this_command_balance_right_after_tab, idx);
+            horrible_hack = set_counts(horrible_hack, idx,n_sets);
+            return "Panel Quit";
+        }break;
+
+        case ("remove") :{
+            Text idx_t; Integer idx;    From_text(this_command_balance_right_after_tab, idx);
+            horrible_hack = remove_page(horrible_hack, idx);
+            return "Panel Quit";
+        }break;
+        case ("new") :{ 
+            horrible_hack = add_page(horrible_hack);
+            return "Panel Quit";
+        }break;
+        case ("add") :{ 
+            horrible_hack = add_page(horrible_hack);
+            get_counts(horrible_hack, active_set, n_sets);
+            horrible_hack = set_basepath(horrible_hack,n_sets,this_command_balance_right_after_tab);
+            return "Panel Quit";
+        }break;
+
+        case ("rebuild") :{ 
+            horrible_hack = reset_pages_from_default(horrible_hack);
+            return "Panel Quit";
+        }break;
+        default :{
+            Print("\nERROR: ("+this_command+") not found! - full text passed in <"+command+">\n");
+        }
+    }
+    return return_text;
+}
+
+
+//// TODO - WIP to panel
+Text part_panel(Text data){ // pass in the text, the text builds the panel, and the response of the panel rebuilds the text.
+    Integer active_set, n_sets;
+    get_counts(data, active_set, n_sets);
+    Dynamic_Text top_buttons;
+    for(Integer i=1;i<=n_sets;i++){
+        Text t = find_replace_char(get_basepath(data,i),'\\','/') + "\" (" + get_wildcard(data,i) + ")";
+        Append("Make Active ->     "+t+"\tactive\t"+To_text(i),top_buttons);
+        Append("Remove ->     "+t+"\tremove\t"+To_text(i),top_buttons);
+    }
+    Dynamic_Text bot_buttons;
+    Append("Add new -> $CUSTOMER_LIB\tadd\t$CUSTOMER_LIB",bot_buttons);    Append("Add new -> $CUSTOMER_USER\tadd\t$CUSTOMER_USER",bot_buttons);
+    Append("Add new -> $USER_LIB\tadd\t$USER_LIB",bot_buttons);    Append("Add new -> $USER\tadd\t$USER",bot_buttons);
+    Append("Add new -> $LIB\tadd\t$LIB",bot_buttons);               Append("Add new -> $SET_UPS\tadd\t$SET_UPS",bot_buttons);
+    Append("NEW -> Add 'blank' page to end\tnew",bot_buttons);    Append("REBUILD -> Reset to 1 default page)\trebuild",bot_buttons); //Append("Exit\texit",buttons);
+
+    horrible_hack = data;
+    Integer n_button_columns = 2,  button_width= -2, button_height = 40;
+    Text title = "Pages Configs";
+    Integer autohide_tick_state = -1; // negative to turn it off totally
+    handle_custom_panel(title, top_buttons, bot_buttons, n_button_columns,  autohide_tick_state, button_width, button_height);
+    data = horrible_hack;
+    horrible_hack = "";
+    return data;
+}
+
+
+//////////////
 Text to_bool(Integer i){    return i ? "True" : "False" ;   }
 
 Integer manage_panel(Integer &pos_x, Integer &pos_y, Text default_page){
@@ -297,6 +399,7 @@ Integer manage_panel(Integer &pos_x, Integer &pos_y, Text default_page){
     Button next_set = Create_button(">","set next");    Set_tooltip(next_set,"next set");       Set_width_in_chars(next_set,1);
     Button new_set = Create_button("+","set new");      Set_tooltip(new_set,"add a set");       Set_width_in_chars(new_set,1);
     Button rem_set = Create_button("-","set rem");      Set_tooltip(rem_set,"remove this set"); Set_width_in_chars(rem_set,1);
+    Button panel_set = Create_button("P","set panel");      Set_tooltip(panel_set,"edit set from a panel"); Set_width_in_chars(panel_set,1);
 
     Input_Box      filter_box = Create_input_box("Filter  ",message_box);   Use_browse_button(filter_box,0);    /* Set_width_in_chars(filter_box,6);*/ 
     Button toggle_sort = Create_button("T","toggle sort");             Set_width_in_chars(toggle_sort,2);      Set_tooltip(toggle_sort,"[v=Desending] [^=Ascending]");
@@ -313,7 +416,7 @@ Integer manage_panel(Integer &pos_x, Integer &pos_y, Text default_page){
     Append(hg1,panel);
     Append(vg_lb,panel);
     Append(hg2,vg_lb);
-    Append(hidden_settings_box,hg1); Append(dir_box,hg1); Append(wildcard_box,hg1);    Append(prev_set,hg1);    Append(next_set,hg1);    Append(new_set,hg1);    Append(rem_set,hg1);    
+    Append(hidden_settings_box,hg1); Append(dir_box,hg1); Append(wildcard_box,hg1);    Append(prev_set,hg1);    Append(next_set,hg1);    Append(new_set,hg1);    Append(rem_set,hg1);    Append(panel_set,hg1);
     Append(filter_box,hg2);   Append(toggle_sort,hg2);    Append(toggle_recursive,hg2);
     Append(list_box,vg_lb);
     Append(message_box,panel);
@@ -443,10 +546,7 @@ Integer manage_panel(Integer &pos_x, Integer &pos_y, Text default_page){
                 is_init = 0;
             }break;
             case (Get_id(new_set)) : {
-                n_sets++;
-                active_set = n_sets;
-                state = set_counts(state,active_set,n_sets);
-                state+="\t"+default_page;
+                state+=add_page(state);
                 is_init = 0;
             }break;
             case (Get_id(rem_set)) : {
@@ -454,6 +554,12 @@ Integer manage_panel(Integer &pos_x, Integer &pos_y, Text default_page){
                     state = remove_page(state,active_set);
                     is_init = 0;
                 }
+            }break;
+            case (Get_id(panel_set)) : {
+                Set_enable(panel,0);
+                state = part_panel(state);
+                is_init = 0;
+                Set_enable(panel,1);
             }break;
         }
         

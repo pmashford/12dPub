@@ -6,6 +6,8 @@
 #define COMMAND_PARSER_NO_FLAGS 0 // use to echo the command only, good way to test command coverage
 #define COMMAND_PARSER_NO_EXECUTE 1 // use to echo the command only, good way to test command coverage
 
+
+// BIG NOTE - Button name CANNOT contain filepaths with a single \  , use a find and replace to /... Conflicts with how the page levels are handled
 Integer include_split_by_tab(Text command, Text &word1, Text &balance_right_after_tab){
     word1 = ""; balance_right_after_tab = "";
     Dynamic_Text parts;
@@ -45,6 +47,11 @@ Text include_panel_hide(){
     return "";
 }
 
+Integer get_max_number_of_chars(Text a[], Integer sizea, Text b[], Integer sizeb){
+    Integer maxa = get_max_number_of_chars(a,sizea);
+    Integer maxb = get_max_number_of_chars(b,sizeb);
+    return (maxa > maxb) ? maxa : maxb;
+}
 
 Text panel_command_parser(Text command, Integer flags); // PROTOTYPE ONLY, DEFINE COMMANDS IN SPECIFIC MACRO
 
@@ -56,11 +63,17 @@ Text include_panel_now(Integer mode, Text title, Integer &pos_x, Integer &pos_y,
                             Text standard_label[], Text standard_command[], Integer size_s, Integer n_columns, Integer &autohide_tick_state, 
                             Integer button_width, Integer button_height){
     if( (pos_x == -1) || (pos_y == -1) ) Get_cursor_position(pos_x,pos_y);
+    if(button_width<0){
+        Integer a = Absolute(button_width);
+        button_width = get_max_number_of_chars(button_label,size_b, standard_label, size_s) / 2 + (2 * a);
+        // Print(button_width);Print();
+    }
     Text return_text="";
     Panel panel = Create_panel(title,1); // TODO - resize
     if(n_columns<1)n_columns=1;
     Integer n_hg_top = ((size_b - 1) / n_columns )+ 1;
     Integer n_hg_bot = ((size_s - 1) / n_columns )+ 1;
+
     Vertical_Group vg_all = Create_vertical_group(ALL_WIDGETS_OWN_HEIGHT);
     Append(vg_all,panel);
     Vertical_Group vg_bot = Create_vertical_group(ALL_WIDGETS_OWN_HEIGHT);
@@ -69,7 +82,7 @@ Text include_panel_now(Integer mode, Text title, Integer &pos_x, Integer &pos_y,
     Horizontal_Group hg_bot[n_hg_bot];
 
     Draw_Box top_box_size_hack[n_hg_top];
-    Draw_Box bot_box_size_hack[n_hg_top];
+    Draw_Box bot_box_size_hack[n_hg_bot];
     Integer box_size_hack_min_height = button_height;
 
     for(Integer i=1;i<=n_hg_top;i++){
@@ -88,7 +101,6 @@ Text include_panel_now(Integer mode, Text title, Integer &pos_x, Integer &pos_y,
         //Set_data(autohide_tick_box,autohide_tick_state);
     }
     Set_width_in_chars(autohide_tick_box,10);   // TODO - get proper centre alignment... at the moment it is filling up HG space in width
-
     for(i=1;i<=n_hg_bot;i++){
         hg_bot[i] = Create_horizontal_group(ALL_WIDGETS_OWN_WIDTH);
         Set_sizing_constraints(hg_bot[i],2,2);
@@ -157,6 +169,7 @@ Text include_panel_now(Integer mode, Text title, Integer &pos_x, Integer &pos_y,
 
                 if(mode == 0){
                     return_text = panel_command_parser(cmd, flags);             // FLOW CONTROL GOES TO THE CUSTOM COMMAND PARSER IN THE MAIN MACRO
+                    if(return_text == "Panel Quit") return return_text;
                     if(autohide_tick_state==1) return "Panel Hide";    // TODO - the panel command parser could want to set something different here, not sure this is too smart setting a fresh return value
                 }
 
@@ -192,7 +205,7 @@ Text panel_display_list_get_reply(Text title, Integer &pos_x, Integer &pos_y, Dy
   return panel_display_list_get_reply(title, pos_x, pos_y, button_label, size, n_columns);
 }
 
-void inlcude_parse_buttons(Text buttons[], Text button_name[], Text panel_level[], Text command[] , Integer s1){
+void include_parse_buttons(Text buttons[], Text button_name[], Text panel_level[], Text command[] , Integer s1){
     for(Integer i=1;i<=s1;i++){
         Dynamic_Text parts1;
         From_text(buttons[i],'\"','\t',parts1); // split by tab ; TOOD - this should only split by first tab, for now means more work to do later within this function
@@ -229,12 +242,12 @@ void handle_custom_panel(Text title, Text buttons_top[], Integer n_buttons_top, 
     Text panel_level[n_buttons_top];
     Text button_name[n_buttons_top];
     Text command[n_buttons_top];
-    inlcude_parse_buttons(buttons_top,button_name,panel_level,command,n_buttons_top);
+    include_parse_buttons(buttons_top,button_name,panel_level,command,n_buttons_top);
 
     Text button_names2[n_buttons_bot];
     Text panel_levels2[n_buttons_bot]; // not used
     Text button_commands2[n_buttons_bot];
-    inlcude_parse_buttons(buttons_bot,button_names2,panel_levels2,button_commands2,n_buttons_bot);
+    include_parse_buttons(buttons_bot,button_names2,panel_levels2,button_commands2,n_buttons_bot);
 
     Integer pos_x=-1,pos_y=-1;
     Text current_panel_level = "";
@@ -278,6 +291,12 @@ void handle_custom_panel(Text title, Dynamic_Text buttons_top_as_dt, Dynamic_Tex
     if(ierr_n_buttons_top)buttons_top[1]="";
     if(ierr_n_buttons_bot)buttons_bot[1]="";
     return handle_custom_panel(title, buttons_top, n_buttons_top, buttons_bot, n_buttons_bot, n_button_columns, autohide_tick_state, button_width, button_height);
+}
+
+void handle_custom_panel(Text title, Dynamic_Text buttons_top_as_dt, Integer n_button_columns,  Integer button_width, Integer button_height){
+    Dynamic_Text buttons_bot_as_dt;
+    Integer autohide_tick_state = -1; // negative to turn it off totally
+    return handle_custom_panel(title, buttons_top_as_dt, buttons_bot_as_dt, n_button_columns, autohide_tick_state, button_width, button_height);
 }
 
 ///////// SPEFICIC FUNCTIONS

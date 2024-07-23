@@ -42,7 +42,7 @@ void test_custom_panel(){
     Integer n_columns = 3;
     Dynamic_Text buttons_top;
     Integer button_width = 12, button_height = 60;  // button_width of 0 means panel will work it out |  button_height about 60 seems OK for phat buttons
-    add_cmd(buttons_top,"Inquire/Measure...",       "Panel\tInquire/Measure");    // format is -> "TEXT\tCMD\tARG1\tARG2"
+    add_cmd(buttons_top,"Inquire/Measure...",       "Panel\tInquire/Measure");    // format is -> "TEXT\tCMD\tARG1\tARG2" add_cmd() is a helper to build the string
     add_cmd(buttons_top,"Create/Edit Points...",    "Panel\tCreate/Edit Points");
     add_cmd(buttons_top,"Menu Panels...",           "Panel\tMenu Panels");
     add_cmd(buttons_top,"View...",                  "Panel\tView");          
