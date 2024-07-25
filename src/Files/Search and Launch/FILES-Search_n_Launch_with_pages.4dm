@@ -1,3 +1,4 @@
+#define DEBUG_CHAIN
 #include "mashy_lib_system_calls.H"
 #include "mashy_lib_files.H"
 #include "mashy_lib_panel_defaults.H"
@@ -5,23 +6,47 @@
 #include "mashy_lib_text_functions.H"
 #include "12d/set_ups.h"
 #include "mashy_lib_widgets_panel_handler_std.H"
+#include "mashy_lib_xml_chains.H"
 
 // NOTES
-// (counts[tab]defaults[tab]page1...)
-// TODO - properly plumb in special characters \t ; :
+// ([counts]\t[defaults]\t[page1]...)
+// TODO - properly plumb in special characters \t ; : (and protect input boxes from breaking string format), maybe 1st page pointer also
 // TODO - Sort by date? or day filter(-100 / +100 days) ... Text command = "forfiles /P \"" + basepath + "\"" + slash_s + wildcard + slash_d + " /C \"cmd /c if @isdir==FALSE echo @path >> " + quotes_add(rpt_file) ;
-// TODO - blow aways settings if they somehow get in a dodgey state (partially done on new pages page)
+// DONE + blow aways settings if they somehow get in a dodgey state (partially done on new pages page)
 // TODO - show OPW ?
 // TODO - do HIDE ?
 // TODO - [ Reveal ] | [ copy /?]
-// TODO - reserve first position in the settings string for future... 1st position should hold panel height as a setting-> (settings[tab]counts[tab]defaults[tab]page1...)
-// TODO - multiple wildcards
+// TODO - reserve first position in the settings string for future... 1st position should hold panel height as a setting-> ([settings]\t[counts]\t[defaults]\t[page1]...)
+// ???? - Text_Text_Multimap / Text_Map -> Integer_Text_Map, might complicate click actions for list_box? - nogo, no key lookup in critical path
+// TODO - cleanup the list of $libs on the page_panel()
+// TODO - quick select wildcard
+// DONE + native 12d handling to [run: 4do,chain  ] [edit: chain]
 
+
+Text handle_possible_multiple_wildcards(Text basepath, Text wildcard){  // "C:\x\y\*.4dm" "c:\b\a\*.4do" /s /b  vs "C:\temp\temp\*.4dm" /s /b
+    wildcard = Text_justify(wildcard);
+    wildcard = find_replace_char(wildcard,',',' '); // ensure space separated
+    wildcard = find_replace_char(wildcard,';',' '); // ensure space separated
+    Dynamic_Text words;
+    From_text(wildcard,'"',' ',words);
+    Integer count;  Get_number_of_items(words,count);
+    if(!count) return "\"" + valid_path(basepath+"\\"+wildcard) + "\"";
+    Text cmd;
+    for(Integer i=1;i<=count;i++){
+            Text t;
+            Get_item(words,i,t);
+            if(i!=1)cmd+=" ";
+            cmd += "\"" + valid_path(basepath+"\\"+t) + "\"";
+    }
+    return cmd;
+}
 
 Dynamic_Text get_files(Text basepath, Text wildcard, Integer is_recursive){
-    Text command = "dir \"" + valid_path(basepath+"\\"+wildcard) + "\" /ogn /a-d";
+    Text command = "dir " +handle_possible_multiple_wildcards(basepath, wildcard) + " /ogn /a-d"; // Handles multiple wildcards safely *.4dm,*.4do  OR *.4dm *.4do
+    //Text command = "dir \"" + valid_path(basepath+"\\"+wildcard) + "\" /ogn /a-d"; // SAFE - this only handled 1 wildcard
     if(is_recursive) command += " /s";
     command += " /b";
+    // Print(command+"\n");
     return run_system_command_get_output(command);
 }
 
@@ -33,14 +58,13 @@ Integer get_files(Text basepath, Text wildcard, Integer is_recursive, Integer da
     Dynamic_Text list = get_files(basepath, wildcard, is_recursive);
 	Integer n_items;
 	Get_number_of_items(list,n_items);
-    // Print(n_items);Print();
 	for(Integer i=1;i<=n_items;i++){
 		Text t,fname,path;
 		Get_item(list,i,t);
-        // Print(t);Print();
         get_file_path_filename(t,path, fname);
         Append(fname,filename);
-        Append(path,path_to_filename);
+        if(is_recursive) Append(path,path_to_filename);
+        else Append(basepath,path_to_filename);  // fixed bug here where no /s doesn't echo full path
 	}
 	return n_items;
 }
@@ -98,6 +122,7 @@ Integer rebuild(List_Box &box, Text filter_pattern, Integer order_assending, Dyn
     path_file_ext = valid_path(this_path+"\\"+this_file);
     get_extension(path_file_ext,ext);
     ext = Text_lower(ext);  // TODO - do it in get_extension()!
+    Print("INSIDE, f<" + this_file +"> p<"+ this_path +"> path:<"+path_file_ext +"> ext:<" +ext+">\n");
     return File_exists(path_file_ext);
 }
 
@@ -109,19 +134,6 @@ Text valid_filter_string(Text t){
 
 void toggle_0_1(Integer &mode){
     mode = (mode) ? 0 : 1;
-}
-
-// panel messages helper
-void set_message(Message_Box message_box, Text source_file, Text json_file){
-    Text msg ="[run] []";
-    if(File_exists(source_file)){
-         msg+= " [open 4dm] ";
-    }else{
-        msg+=" [] ";
-    }
-    if(File_exists(json_file))msg += ", json to OPW, ";
-    msg+= "../"+get_parent(source_file)+"/";
-    Set_data(message_box,msg);
 }
 
 
@@ -386,6 +398,22 @@ Text part_panel(Text data){ // pass in the text, the text builds the panel, and 
 
 
 //////////////
+
+
+// panel messages helper - TODO - expand for chains
+void set_message(Message_Box message_box, Text source_file, Text json_file){
+    Text msg ="[run] []";
+    if(File_exists(source_file)){
+         msg+= " [open 4dm] ";
+    }else{
+        msg+=" [] ";
+    }
+    if(File_exists(json_file))msg += ", json to OPW, ";
+    msg+= "../"+get_parent(source_file)+"/";
+    Set_data(message_box,msg);
+}
+
+
 Text to_bool(Integer i){    return i ? "True" : "False" ;   }
 
 Integer manage_panel(Integer &pos_x, Integer &pos_y, Text default_page){
@@ -489,25 +517,34 @@ Integer manage_panel(Integer &pos_x, Integer &pos_y, Text default_page){
             case (Get_id(list_box)) : {
                 Text path_file_ext, ext;
                 if(!get_filename_check_exists(msg, lb_files, lb_paths, path_file_ext, ext)){
-                    Print("ERROR: shouldn't get here !");
+                    Print("ERROR: shouldn't get here!, thinks file does not where fullpath:<"+path_file_ext +"> ext:<" +ext+">\n");
                     break;
                 }
+                
                 Text source_file = Get_subtext(path_file_ext,1,Text_length(path_file_ext)-Text_length(ext)) + "4dm";
                 Text json_file = Get_subtext(path_file_ext,1,Text_length(path_file_ext)-Text_length(ext)) + "json";
                 set_message(message_box,source_file,json_file);
-
+                Print(cmd+"\n");
                 switch (cmd) {
                     case ("double_click_lb") :{
-                        if(ext == "4do")    Create_macro("-no_console -close_on_exit \""+path_file_ext+"\"",1);   // run a 4do
-                        else execute_file("\""+path_file_ext+"\"");                                         // run not a 4do
+                        switch (ext){
+                            case("4do")     :{ Create_macro("-no_console -close_on_exit \""+path_file_ext+"\"",1);   } break; // run a 4do
+                            case("chain")   :{ Run_chain_as_macro(path_file_ext);   } break;                                           // run a chain, dont quote
+                            default         :{ execute_file("\""+path_file_ext+"\"");   }break;                               // run a non native file
+                        }
                     }break;
                     case ("click_lb") :{
                         
                         echo(json_file);
                     }break;
-                    case ("double_click_rb") :{
-                        if(!File_exists(source_file)) break;
-                        execute_file("\""+source_file+"\"");
+                    case ("double_click_rb") :{ 
+                        switch (ext){
+                            case("chain")   :{ edit_chain_via_chain("\""+path_file_ext+"\""); } break;
+                            default         :{ 
+                                if(!File_exists(source_file)) break;
+                                execute_file("\""+source_file+"\"");
+                            }break;
+                        }
                     }break;
                     case ("click_rb") :{
 
@@ -549,7 +586,7 @@ Integer manage_panel(Integer &pos_x, Integer &pos_y, Text default_page){
                 is_init = 0;
             }break;
             case (Get_id(new_set)) : {
-                state+=add_page(state);
+                state = add_page(state);
                 is_init = 0;
             }break;
             case (Get_id(rem_set)) : {

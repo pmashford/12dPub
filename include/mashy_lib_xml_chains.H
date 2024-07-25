@@ -103,6 +103,25 @@ XML_Node create_link_run_option(XML_Node &panel_node){
 	return node;
 }
 
+XML_Node create_link_option_manual(XML_Node panel_node, Text panel_name, Text button_name){
+    XML_Node node = create_chain_link("Manual_option","Option Recalc Chain - Manual");
+    XML_Node panel_data_node = Create_node("Panel_Data");
+    Append_node(node,panel_data_node);
+        XML_Node screen_layout_node = Create_node("screen_layout");
+        add_xml_node(screen_layout_node,"version","1.0");			// static for now - def
+        Append_node(panel_data_node,screen_layout_node);
+            Append_node(screen_layout_node,panel_node);
+    add_xml_node(node,"Panel_Name",panel_name);			// Is this even needed?
+    add_xml_node(node,"Clean_Up","1");			// Is this even needed?
+    XML_Node buttons_node = Create_node("Buttons");
+    Append_node(node,buttons_node);
+    XML_Node button_node = Create_node("Button");
+    Append_node(buttons_node,button_node);
+        add_xml_node(button_node,"Name",button_name);
+        add_xml_node(button_node,"Order","0");			// static for now, how to handle mutliple button presses I guess
+	return node;
+}
+
 XML_Node create_link_run_chain(Text chain_name){
 	XML_Node node = create_chain_link("Chain","Recalc chain "+chain_name);
 	add_xml_node(node,"Chain",chain_name);
@@ -360,6 +379,12 @@ Integer run_chain(XML_Document &chain_doc){
 	return run_chain(chain_doc, use_macro_name_in_chain_name, do_file_delete);
 }
 
+Integer run_link_via_chain(XML_Node link_node){ // & commented out pass by reference
+	XML_Document  chain = create_chain();
+	set_meta_data_metric(chain);
+	append_command(chain,link_node);
+	return run_chain(chain);
+}
 
 Integer run_panel_via_chain(XML_Node panel_node){ // & commented out pass by reference
 	XML_Document  chain = create_chain();
@@ -397,6 +422,13 @@ Integer run_a_macro_via_chain(Text my_path, Dynamic_Text &args){
 	XML_Node x = create_link_macro(my_path,args);
 	return run_command_via_chain(x);
 
+}
+
+Integer edit_chain_via_chain(Text file_name){
+    XML_Node panel_node = slf_create_panel_node("Recalc Chain");
+	slf_append_file_box		(panel_node,"Chain file",file_name);
+    XML_Node link_node = create_link_option_manual(panel_node,"Recalc Chain","Edit");
+    return run_link_via_chain(link_node);
 }
 
 
