@@ -121,7 +121,7 @@ Integer rebuild(List_Box &box, Text filter_pattern, Integer order_assending, Dyn
     path_file_ext = valid_path(this_path+"\\"+this_file);
     get_extension(path_file_ext,ext);
     ext = Text_lower(ext);  // TODO - do it in get_extension()!
-    Print("INSIDE, f<" + this_file +"> p<"+ this_path +"> path:<"+path_file_ext +"> ext:<" +ext+">\n");
+    // Print("INSIDE, f<" + this_file +"> p<"+ this_path +"> path:<"+path_file_ext +"> ext:<" +ext+">\n");
     return File_exists(path_file_ext);
 }
 
