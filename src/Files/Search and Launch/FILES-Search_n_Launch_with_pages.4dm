@@ -1,4 +1,3 @@
-#define DEBUG_CHAIN
 #include "mashy_lib_system_calls.H"
 #include "mashy_lib_files.H"
 #include "mashy_lib_panel_defaults.H"
@@ -398,18 +397,28 @@ Text part_panel(Text data){ // pass in the text, the text builds the panel, and 
 
 
 //////////////
-
-
 // panel messages helper - TODO - expand for chains
-void set_message(Message_Box message_box, Text source_file, Text json_file){
+void set_message(Message_Box message_box, Text path_file_ext, Text ext, Text source_file, Text json_file){
     Text msg ="[run] []";
-    if(File_exists(source_file)){
-         msg+= " [open 4dm] ";
-    }else{
-        msg+=" [] ";
+    switch (ext) {
+        case ("4do") :{
+            if(File_exists(source_file)){
+                msg+= " [open 4dm] ";
+            }else{
+                msg+=" [] ";
+            }
+            if(File_exists(json_file))msg += ", json to OPW, ";
+            msg+= "../"+get_parent(source_file)+"/";
+        }break;
+
+        case ("chain") :{
+            if(File_exists(path_file_ext)){
+                msg= " [run chain] [] [edit chain] ../"+get_parent(source_file)+"/";
+            }else{
+                msg=" [] ";
+            }
+        }break;
     }
-    if(File_exists(json_file))msg += ", json to OPW, ";
-    msg+= "../"+get_parent(source_file)+"/";
     Set_data(message_box,msg);
 }
 
@@ -523,8 +532,8 @@ Integer manage_panel(Integer &pos_x, Integer &pos_y, Text default_page){
                 
                 Text source_file = Get_subtext(path_file_ext,1,Text_length(path_file_ext)-Text_length(ext)) + "4dm";
                 Text json_file = Get_subtext(path_file_ext,1,Text_length(path_file_ext)-Text_length(ext)) + "json";
-                set_message(message_box,source_file,json_file);
-                Print(cmd+"\n");
+                set_message(message_box,path_file_ext, ext,source_file,json_file);
+                // Print(cmd+"\n");
                 switch (cmd) {
                     case ("double_click_lb") :{
                         switch (ext){
