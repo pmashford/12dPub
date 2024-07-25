@@ -20,7 +20,20 @@
 // TODO - cleanup the list of $libs on the page_panel()
 // TODO - quick select wildcard
 // DONE + native 12d handling to [run: 4do,chain  ] [edit: chain]
+// TODO - right click menu
 
+
+Integer run_chain_as_macro(Text chain_file,Integer do_cleanup){ //https://beta.12dmodel.com/forums/viewtopic.php?t=18546
+    Integer ierr = Run_chain_as_macro(chain_file);
+    if(do_cleanup && File_exists(chain_file)){
+        Text ext;
+        get_extension(chain_file,ext);
+        chain_file = Get_subtext(chain_file,1,Text_length(chain_file)-Text_length(ext));
+        File_delete(chain_file+"4dm");
+        File_delete(chain_file+"4do");
+    }
+    return ierr;
+}
 
 Text handle_possible_multiple_wildcards(Text basepath, Text wildcard){  // "C:\x\y\*.4dm" "c:\b\a\*.4do" /s /b  vs "C:\temp\temp\*.4dm" /s /b
     wildcard = Text_justify(wildcard);
@@ -538,7 +551,7 @@ Integer manage_panel(Integer &pos_x, Integer &pos_y, Text default_page){
                     case ("double_click_lb") :{
                         switch (ext){
                             case("4do")     :{ Create_macro("-no_console -close_on_exit \""+path_file_ext+"\"",1);   } break; // run a 4do
-                            case("chain")   :{ Run_chain_as_macro(path_file_ext);   } break;                                           // run a chain, dont quote
+                            case("chain")   :{ run_chain_as_macro(path_file_ext,1);   } break;                                           // run a chain, dont quote
                             default         :{ execute_file("\""+path_file_ext+"\"");   }break;                               // run a non native file
                         }
                     }break;
