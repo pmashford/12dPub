@@ -872,13 +872,12 @@ Integer valid_path(Text path, Text &fixed){
 	if(nparts < 1)return 1;
 	fixed = "";
 	Text parts[nparts];
-	Integer c = '$';
 	Integer possible_errors=0;
-	for(Integer i=1;i<=nparts;i++){
+	for(Integer i=1;i<=nparts;i++){			// expand $vars
 		Get_item(parts_dt,i,parts[i]);
 		Integer c1;
 		Get_char(parts[i],1,c1);
-		if(c1==c){
+		if(c1=='$'){
 			Text suffix = Get_subtext(parts[i],2,Text_length(parts[i]));
 			Text this_env = Getenv(Text_upper(suffix));
 			if(this_env == ""){
@@ -887,26 +886,44 @@ Integer valid_path(Text path, Text &fixed){
 			if(this_env != ""){
 				parts[i] = this_env;
 			}else{
-				// do nothing
-				possible_errors++;
+				//hack
+				if(Text_lower(parts[i]) == "$working" ){
+					Get_project_folder(parts[i]);
+				}else{
+					// do nothing
+					possible_errors++;
+				}
 			}
 		}
 	}
-	Integer this_part_idx = 0;
+	Null(parts_dt);
 	for(i=1;i<=nparts;i++){ // walk the path
-		if(parts[i]==".")continue;
-		if(parts[i]==".."){
+		Append(parts[i],parts_dt);
+	}
+	set_file_path_parts(parts_dt,fixed); // this could have ..\..\ in there
+	Null(parts_dt);
+	get_file_path_parts(fixed,parts_dt);
+	Get_number_of_items(parts_dt,nparts);
+	if(nparts < 1)return 1;
+	fixed = "";
+	Text parts2[nparts];
+
+	Integer this_part_idx = 0;
+	for(i=1;i<=nparts;i++){ 			// walk the path and resolve ..\..\..
+		Get_item(parts_dt,i,parts2[i]);
+		if(parts2[i]==".")continue;
+		if(parts2[i]==".."){
 			if(this_part_idx>0){
 				this_part_idx--;
 			}
 			continue;
 		}
 		this_part_idx++;
-		parts[this_part_idx] = parts[i];
+		parts2[this_part_idx] = parts2[i];
 	}
 	Null(parts_dt);
 	for(i=1;i<=this_part_idx;i++){
-		Append(parts[i],parts_dt);
+		Append(parts2[i],parts_dt);
 	}
 	set_file_path_parts(parts_dt,fixed);
 	return possible_errors;
@@ -1006,7 +1023,7 @@ Integer resolve_env(Text &source){
 
 
 
-Integer directory_exists(Text directory_name){
+Integer directory_exists(Text directory_name){ // TODO - 
 // http://forums.12dmodel.com/viewtopic.php?t=846
 //Description
 //Checks to see if a file of name file_name exists.

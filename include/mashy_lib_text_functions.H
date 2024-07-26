@@ -711,6 +711,19 @@ Integer get_max_number_of_chars(Text t[], Integer size){
 	return max_chars;
 }
 
+// example... expects in=string, bad_chars=";\\:\t", replace_char = ' ';
+// Text text = find_replace_invalid_chars_with_char(text,";\\:\t",' ');
+Text find_replace_invalid_chars_with_char(Text in, Text bad_chars, Integer replace_char){
+	Integer len = Text_length(in);
+	for(Integer i=1;i<=len;i++){
+		Text t = Get_subtext(in,i,i); // this char is t
+		if(Find_text(bad_chars,t)){	  // if it's a bad char...
+			Set_char(in,i,replace_char); //Set_subtext(in,i,r);	  // replace that mofo
+		}
+	}
+	return in;
+}
+
 
 Text find_replace_repeat_fork_bomb(Text str, Text pat, Text replace){
 	// find and replace all occourances and return a new string
@@ -817,9 +830,7 @@ Text find_replace_spaces(Text text){
 	while(1){
 		Integer i = Find_text(text," ");
 		if(!i)break;
-		//Integer textLength = Text_length(text);
-		//text = Get_subtext(text, 1, i - 1) + "_" + Get_subtext(text, i + 1, textLength);
-		Set_subtext(text,i,"_");
+		Set_subtext(text,i,"_"); // TODO - this may be faster?>> Set_char(text,i,'_'); 
 	}
 	return text;
 }

@@ -2,6 +2,7 @@
 #include "mashy_lib_files_base64.H"
 // #include "mashy_lib_widgets_validate.H"
 #include "mashy_lib_about_panel.H"
+#include "mashy_lib_widgets_standard.H"
 
 
 void process(Text cc4d_file, Text v14_file, Text v15_file, Text new_file){
@@ -28,12 +29,7 @@ void go_panel(){
     File_Box v15_box = Create_file_box("v15 4do",message_box,CHECK_FILE_MUST_EXIST,"*.4do");
     File_Box new_box = Create_file_box("New 4do",message_box,CHECK_FILE_NEW,"*.4do");
     Button go_button = Create_button(" Pack ","go n pack");
-    Append(cc4d_box,panel);
-    Append(v14_box,panel);
-    Append(v15_box,panel);
-    Append(new_box,panel);
-    Append(go_button,panel);
-    Append(message_box,panel);
+    append(cc4d_box, v14_box, v15_box, new_box, go_button, message_box, panel);
     Show_widget(panel);
     Set_data(cc4d_box,"C:\\Program Files\\12d\\12dmodel\\14.00\\nt.x64\\cc4d.exe");
     // Set_data(v14_box,".4do");

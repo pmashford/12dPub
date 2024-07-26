@@ -6,6 +6,7 @@
 #include "12d/set_ups.h"
 #include "mashy_lib_widgets_panel_handler_std.H"
 #include "mashy_lib_xml_chains.H"
+#include "mashy_lib_widgets_standard.H"
 
 // NOTES
 // ([counts]\t[defaults]\t[page1]...)
@@ -15,7 +16,7 @@
 // TODO - show OPW ?
 // TODO - do HIDE ?
 // TODO - [ Reveal ] | [ copy /?]
-// TODO - reserve first position in the settings string for future... 1st position should hold panel height as a setting-> ([settings]\t[counts]\t[defaults]\t[page1]...)
+// TODO - reserve first position in the settings string for future... 1st position should hold panel height as a setting-> ([settings]\t[counts]\t[defaults]\t[page1]...)... but how TF can we set panel height
 // ???? - Text_Text_Multimap / Text_Map -> Integer_Text_Map, might complicate click actions for list_box? - nogo, no key lookup in critical path
 // TODO - cleanup the list of $libs on the page_panel()
 // TODO - quick select wildcard
@@ -23,12 +24,12 @@
 // TODO - right click menu
 
 
-Integer run_chain_as_macro(Text chain_file,Integer do_cleanup){ //https://beta.12dmodel.com/forums/viewtopic.php?t=18546
+Integer run_chain_as_macro(Text chain_file, Integer do_cleanup){ //https://beta.12dmodel.com/forums/viewtopic.php?t=18546  : using wrapper for now
     Integer ierr = Run_chain_as_macro(chain_file);
-    if(do_cleanup && File_exists(chain_file)){
+    if(!ierr && do_cleanup && File_exists(chain_file)){
         Text ext;
         get_extension(chain_file,ext);
-        chain_file = Get_subtext(chain_file,1,Text_length(chain_file)-Text_length(ext));
+        chain_file = Get_subtext(chain_file,1, Text_length(chain_file) - Text_length(ext) );
         File_delete(chain_file+"4dm");
         File_delete(chain_file+"4do");
     }
@@ -83,10 +84,7 @@ Integer get_files(Text basepath, Text wildcard, Integer is_recursive, Integer da
 
 void wait_on_panel_hide(){}
 
-void clear(List_Box &b){
-    Integer n;  Get_number_of_items(b,n);
-    for(Integer i=n;i>0;i--)    Delete_item(b,i);
-}
+void clear(List_Box &b){    while( !Delete_item(b,1) );     }
 
 Integer rebuild(List_Box &box, Text filter_pattern, Integer order_assending, Dynamic_Text &files_in, Dynamic_Text &paths_in, Dynamic_Text &files_out, Dynamic_Text &paths_out ){
     clear(box);
@@ -413,6 +411,7 @@ Text part_panel(Text data){ // pass in the text, the text builds the panel, and 
 // panel messages helper - TODO - expand for chains
 void set_message(Message_Box message_box, Text path_file_ext, Text ext, Text source_file, Text json_file){
     Text msg ="[run] []";
+    Text parent = get_parent(path_file_ext);
     switch (ext) {
         case ("4do") :{
             if(File_exists(source_file)){
@@ -421,15 +420,19 @@ void set_message(Message_Box message_box, Text path_file_ext, Text ext, Text sou
                 msg+=" [] ";
             }
             if(File_exists(json_file))msg += ", json to OPW, ";
-            msg+= "../"+get_parent(source_file)+"/";
+            msg+= "../"+parent+"/";
         }break;
 
         case ("chain") :{
             if(File_exists(path_file_ext)){
-                msg= " [run chain] [] [edit chain] ../"+get_parent(source_file)+"/";
+                msg= " [run chain] [] [edit chain] ../"+parent+"/";
             }else{
                 msg=" [] ";
             }
+        }break;
+
+        default :{
+            msg+=" [] ../"+parent+"/";
         }break;
     }
     Set_data(message_box,msg);
@@ -455,10 +458,11 @@ Integer manage_panel(Integer &pos_x, Integer &pos_y, Text default_page){
     Button panel_set = Create_button("P","set panel");      Set_tooltip(panel_set,"edit set from a panel"); Set_width_in_chars(panel_set,1);
 
     Input_Box      filter_box = Create_input_box("Filter  ",message_box);   Use_browse_button(filter_box,0);    /* Set_width_in_chars(filter_box,6);*/ 
-    Button toggle_sort = Create_button("T","toggle sort");             Set_width_in_chars(toggle_sort,2);      Set_tooltip(toggle_sort,"[v=Desending] [^=Ascending]");
-    Button toggle_recursive = Create_button("S","toggle recursive");   Set_width_in_chars(toggle_recursive,2); Set_tooltip(toggle_recursive,"[S=Recursive Search] [$=Not Recursive]");
+    Button toggle_sort = Create_bitmap_button("T","toggle sort","xx");             Set_width_in_chars(toggle_sort,2);      Set_tooltip(toggle_sort,"[v=Desending] [^=Ascending]");
+    Button toggle_recursive = Create_bitmap_button("S","toggle recursive","xx");   Set_width_in_chars(toggle_recursive,2); Set_tooltip(toggle_recursive,"[S=Recursive Search] [$=Not Recursive]");
 
-    List_Box list_box = Create_list_box("list title", message_box,6);
+#define LIST_BOX_HEIGHT_MIN 8
+    List_Box list_box = Create_list_box("list title", message_box, LIST_BOX_HEIGHT_MIN);     Set_auto_cut_paste(list_box,0);
 
     Input_Box hidden_settings_box = Create_input_box( "" ,message_box);   Set_width_in_chars(hidden_settings_box,0);            Use_browse_button(hidden_settings_box,0);     Set_dump_name(hidden_settings_box,HIDDEN_SETTINGS_NAME);//Append(n_sets_box,hg_hack);
     Set_sizing_constraints(hidden_settings_box,4,4); // magic
@@ -466,13 +470,10 @@ Integer manage_panel(Integer &pos_x, Integer &pos_y, Text default_page){
     Horizontal_Group hg2 = Create_horizontal_group(1);
     Vertical_Group vg_lb = Create_vertical_group(0); Set_border(vg_lb,"-");
 
-    Append(hg1,panel);
-    Append(vg_lb,panel);
-    Append(hg2,vg_lb);
-    Append(hidden_settings_box,hg1); Append(dir_box,hg1); Append(wildcard_box,hg1);    Append(prev_set,hg1);    Append(next_set,hg1);    Append(new_set,hg1);    Append(rem_set,hg1);    Append(panel_set,hg1);
-    Append(filter_box,hg2);   Append(toggle_sort,hg2);    Append(toggle_recursive,hg2);
-    Append(list_box,vg_lb);
-    Append(message_box,panel);
+    append(hg1, vg_lb, message_box, panel); // main containers for panel
+    append(hidden_settings_box, dir_box, wildcard_box, prev_set, next_set, new_set, rem_set, panel_set, hg1);   // 'page' row as hg1
+    append(filter_box, toggle_sort, toggle_recursive, hg2); // 'filter' row as hg2
+    append(hg2, list_box, vg_lb);   // 'filter' column
 
     Show_widget(panel,pos_x,pos_y);
     read_panel_from_appdata(panel);
@@ -486,7 +487,8 @@ Integer manage_panel(Integer &pos_x, Integer &pos_y, Text default_page){
     while(1){
         // Print(state+"\n");
         Integer active_set, n_sets;     get_counts(state,active_set, n_sets);
-        Text basepath = valid_path(get_basepath(state,active_set));
+        // Text basepath = valid_path(get_basepath(state,active_set));
+        Text basepath = get_basepath(state,active_set);
         Text wildcard = get_wildcard(state,active_set);
         Text filter = get_filter(state,active_set);
         Integer is_ascending = get_ascending(state,active_set);
@@ -496,7 +498,7 @@ Integer manage_panel(Integer &pos_x, Integer &pos_y, Text default_page){
         if(!is_init){   // if this is 0 the directory will be searched for file
             is_init = 1;
             is_upto_date = 0;   // and it will also trigger an update the list box also
-            n_files = get_files(basepath, wildcard, is_recursive, 0, all_files, all_paths);
+            n_files = get_files(valid_path(basepath), wildcard, is_recursive, 0, all_files, all_paths);
         }
         if(!is_upto_date){
             is_upto_date = 1;
@@ -510,6 +512,7 @@ Integer manage_panel(Integer &pos_x, Integer &pos_y, Text default_page){
 
         Set_name(toggle_sort,"^");       if(is_ascending)Set_name(toggle_sort,"v");
         Set_name(toggle_recursive,"$");  if(is_recursive)Set_name(toggle_recursive,"/s");
+
 
         Integer id; Text cmd, msg;
         Wait_on_widgets(id,cmd,msg);
@@ -537,6 +540,7 @@ Integer manage_panel(Integer &pos_x, Integer &pos_y, Text default_page){
 
         switch (id) {
             case (Get_id(list_box)) : {
+                if(cmd =="paste" || msg == "0" || msg == "")break;  // guard
                 Text path_file_ext, ext;
                 if(!get_filename_check_exists(msg, lb_files, lb_paths, path_file_ext, ext)){
                     Print("ERROR: shouldn't get here!, thinks file does not where fullpath:<"+path_file_ext +"> ext:<" +ext+">\n");
@@ -569,7 +573,7 @@ Integer manage_panel(Integer &pos_x, Integer &pos_y, Text default_page){
                         }
                     }break;
                     case ("click_rb") :{
-
+                        Set_selection(list_box,to_int(msg));
                     }break;
                 }
 
@@ -584,6 +588,7 @@ Integer manage_panel(Integer &pos_x, Integer &pos_y, Text default_page){
 
             case (Get_id(dir_box)) : {
                 if(cmd == "text selected"){
+                    Get_data(dir_box,msg);
                     state = set_basepath(state,active_set,msg);
                     is_init = 0; // get files again and rebuild
                 }

@@ -1,7 +1,36 @@
 #ifndef mashy_lib_widgets_standard_H_included
 #define mashy_lib_widgets_standard_H_included
 
+// append upto _9_ widgets to a [ Panel | Vertical_Group | Horizontal_Group ] (UPDATE _X_ )
+void append(Widget child, Panel parent){	Append(child,parent);}
+void append(Widget child1, Widget child2, Panel parent){	Append(child1,parent); Append(child2,parent); }
+void append(Widget child1, Widget child2, Widget child3, Panel parent){	Append(child1,parent); Append(child2,parent); Append(child3,parent); }
+void append(Widget child1, Widget child2, Widget child3, Widget child4, Panel parent){	Append(child1,parent); Append(child2,parent); Append(child3,parent); Append(child4,parent); }
+void append(Widget child1, Widget child2, Widget child3, Widget child4, Widget child5, Panel parent){	Append(child1,parent); Append(child2,parent); Append(child3,parent); Append(child4,parent); Append(child5,parent); }
+void append(Widget child1, Widget child2, Widget child3, Widget child4, Widget child5, Widget child6, Panel parent){	Append(child1,parent); Append(child2,parent); Append(child3,parent); Append(child4,parent); Append(child5,parent); Append(child6,parent); }
+void append(Widget child1, Widget child2, Widget child3, Widget child4, Widget child5, Widget child6, Widget child7, Panel parent){	Append(child1,parent); Append(child2,parent); Append(child3,parent); Append(child4,parent); Append(child5,parent); Append(child6,parent); Append(child7,parent); }
+void append(Widget child1, Widget child2, Widget child3, Widget child4, Widget child5, Widget child6, Widget child7, Widget child8, Panel parent){	Append(child1,parent); Append(child2,parent); Append(child3,parent); Append(child4,parent); Append(child5,parent); Append(child6,parent); Append(child7,parent); Append(child8,parent); }
+void append(Widget child1, Widget child2, Widget child3, Widget child4, Widget child5, Widget child6, Widget child7, Widget child8, Widget child9, Panel parent){	Append(child1,parent); Append(child2,parent); Append(child3,parent); Append(child4,parent); Append(child5,parent); Append(child6,parent); Append(child7,parent); Append(child8,parent); Append(child9,parent); }
 
+void append(Widget child,  Vertical_Group parent){	Append(child,parent);}
+void append(Widget child1, Widget child2, Vertical_Group parent){	Append(child1,parent); Append(child2,parent); }
+void append(Widget child1, Widget child2, Widget child3, Vertical_Group parent){	Append(child1,parent); Append(child2,parent); Append(child3,parent); }
+void append(Widget child1, Widget child2, Widget child3, Widget child4, Vertical_Group parent){	Append(child1,parent); Append(child2,parent); Append(child3,parent); Append(child4,parent); }
+void append(Widget child1, Widget child2, Widget child3, Widget child4, Widget child5, Vertical_Group parent){	Append(child1,parent); Append(child2,parent); Append(child3,parent); Append(child4,parent); Append(child5,parent); }
+void append(Widget child1, Widget child2, Widget child3, Widget child4, Widget child5, Widget child6, Vertical_Group parent){	Append(child1,parent); Append(child2,parent); Append(child3,parent); Append(child4,parent); Append(child5,parent); Append(child6,parent); }
+void append(Widget child1, Widget child2, Widget child3, Widget child4, Widget child5, Widget child6, Widget child7, Vertical_Group parent){	Append(child1,parent); Append(child2,parent); Append(child3,parent); Append(child4,parent); Append(child5,parent); Append(child6,parent); Append(child7,parent); }
+void append(Widget child1, Widget child2, Widget child3, Widget child4, Widget child5, Widget child6, Widget child7, Widget child8, Vertical_Group parent){	Append(child1,parent); Append(child2,parent); Append(child3,parent); Append(child4,parent); Append(child5,parent); Append(child6,parent); Append(child7,parent); Append(child8,parent); }
+void append(Widget child1, Widget child2, Widget child3, Widget child4, Widget child5, Widget child6, Widget child7, Widget child8, Widget child9, Vertical_Group parent){	Append(child1,parent); Append(child2,parent); Append(child3,parent); Append(child4,parent); Append(child5,parent); Append(child6,parent); Append(child7,parent); Append(child8,parent); Append(child9,parent); }
+
+void append(Widget child,  Horizontal_Group parent){	Append(child,parent);}
+void append(Widget child1, Widget child2, Horizontal_Group parent){	Append(child1,parent); Append(child2,parent); }
+void append(Widget child1, Widget child2, Widget child3, Horizontal_Group parent){	Append(child1,parent); Append(child2,parent); Append(child3,parent); }
+void append(Widget child1, Widget child2, Widget child3, Widget child4, Horizontal_Group parent){	Append(child1,parent); Append(child2,parent); Append(child3,parent); Append(child4,parent); }
+void append(Widget child1, Widget child2, Widget child3, Widget child4, Widget child5, Horizontal_Group parent){	Append(child1,parent); Append(child2,parent); Append(child3,parent); Append(child4,parent); Append(child5,parent); }
+void append(Widget child1, Widget child2, Widget child3, Widget child4, Widget child5, Widget child6, Horizontal_Group parent){	Append(child1,parent); Append(child2,parent); Append(child3,parent); Append(child4,parent); Append(child5,parent); Append(child6,parent); }
+void append(Widget child1, Widget child2, Widget child3, Widget child4, Widget child5, Widget child6, Widget child7, Horizontal_Group parent){	Append(child1,parent); Append(child2,parent); Append(child3,parent); Append(child4,parent); Append(child5,parent); Append(child6,parent); Append(child7,parent); }
+void append(Widget child1, Widget child2, Widget child3, Widget child4, Widget child5, Widget child6, Widget child7, Widget child8, Horizontal_Group parent){	Append(child1,parent); Append(child2,parent); Append(child3,parent); Append(child4,parent); Append(child5,parent); Append(child6,parent); Append(child7,parent); Append(child8,parent); }
+void append(Widget child1, Widget child2, Widget child3, Widget child4, Widget child5, Widget child6, Widget child7, Widget child8, Widget child9, Horizontal_Group parent){	Append(child1,parent); Append(child2,parent); Append(child3,parent); Append(child4,parent); Append(child5,parent); Append(child6,parent); Append(child7,parent); Append(child8,parent); Append(child9,parent); }
 
 //--------------------------------------------------------------------------------
 //                        USED TO CREATE WIDGET ARRAYS, AND FOR GRIDS
