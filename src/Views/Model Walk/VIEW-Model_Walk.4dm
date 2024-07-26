@@ -3,11 +3,11 @@
 #include "mashy_lib_widgets_list_box.H"
 #include "mashy_lib_widgets_validate.H"
 #include "mashy_lib_views.H"
-#include "mashy_lib_text_functions.H"
-#include "mashy_lib_model_functions.H"
+//#include "mashy_lib_text_functions.H"
+//#include "mashy_lib_model_functions.H"
 #include "mashy_lib_about_panel.H"
 #include "mashy_lib_widgets_standard.H"
-#include "defaults.H"
+#include "mashy_lib_panel_defaults.H"
 
 #define DEBUG 0
 
@@ -39,60 +39,35 @@ Integer refresh_list_box(List_Box &box, Input_Box &input_box){
 	return 0;
 }
 
-void my_set_focus(Widget w){
-	Integer x,y,l,h;
-	Get_position(w,x,y);
-	Get_size(w,l,h);
-	Set_cursor_position(x+l/2,y+h*2);
-}
+Integer manage_a_panel(){
 
-Integer manage_a_panel(Integer &posx, Integer &posy, Integer &size, Integer &button_focus){
-
-	Panel panel = Create_panel("Model Walk");
+	Panel panel = Create_panel("Model Walk",1);
 	Message_Box message_box = Create_message_box("");
 	Vertical_Group vg = Create_vertical_group(0);
 
-	validate_size(size);
-
-	View_Box view_box = Create_view_box("",message_box,1);	Set_width_in_chars(view_box,8);
-	Input_Box input_box = Create_input_box("",message_box);	Set_width_in_chars(input_box,8);
-	List_Box list_box = Create_list_box("List",message_box,size*5);
-	Named_Tick_Box tick_box = Create_named_tick_box("Fit view?",1,"fit view");
+	View_Box view_box = Create_view_box("",message_box,1);	Set_width_in_chars(view_box,8);	Set_dump_name(view_box,"View to walk");
+	Input_Box input_box = Create_input_box("",message_box);	Set_width_in_chars(input_box,8);	Set_dump_name(input_box,"Model filter");
+	List_Box list_box = Create_list_box("List",message_box,10);
 
 	Button button = Create_button("  Refresh  ","refresh");
 
-	Button button_grow = Create_button("v","grow");	Set_width_in_chars(button_grow,2);
-	Button button_shrink = Create_button(" ^ ","shrink");	Set_width_in_chars(button_shrink,2);
-
 	Horizontal_Group hg_buttons = Create_button_group();
-	Horizontal_Group hg_resize = Create_button_group();
 	Horizontal_Group hg_bot = Create_horizontal_group(0);
 	Horizontal_Group hg_top = Create_horizontal_group(0);
 
 	append(vg, panel);
-	append(hg_top, list_box, hg_bot,vg);
+	append(hg_top, list_box, hg_buttons,vg);
 	append(view_box, input_box, hg_top);
-	append(hg_buttons, hg_resize, hg_bot);
 	append(button, hg_buttons);
-	append(button_grow, button_shrink, hg_resize);
 
-	Show_widget(panel, posx, posy);
+	Show_widget(panel);
 
 	Set_selections(list_box,0);
 	Set_auto_cut_paste(list_box,0);
 
-	read_defaults_file(view_box, input_box, size);
+	read_panel(panel);
 
 	refresh_list_box(list_box,input_box);
-
-	if(button_focus){
-		if(button_focus==1){
-			my_set_focus(button_grow);
-		}else{
-			my_set_focus(button_shrink);
-		}
-		button_focus = 0;
-	}
 
 	while(1){
 		Integer id;	Text cmd,msg;
@@ -100,7 +75,7 @@ Integer manage_a_panel(Integer &posx, Integer &posy, Integer &size, Integer &but
 		// Print("Id=" + To_text(id) + " cmd=" + cmd + " msg=" + msg + "\n");
 		if(cmd == "keystroke")	{	if(id != Get_id(input_box))	continue;}
 		if(cmd == "Panel About")	manage_about_panel();
-		if(cmd == "Panel Quit")	{	write_defaults_file(view_box, input_box, size);	return(1);	}
+		if(cmd == "Panel Quit")	{	write_panel(panel);	return(1);	}
 
 		switch(id){
 
@@ -130,38 +105,12 @@ Integer manage_a_panel(Integer &posx, Integer &posy, Integer &size, Integer &but
 				}
 			}break;
 
-			case Get_id(button_grow) : {
-				Get_widget_size(panel,posx,posy);
-				Get_widget_position(panel,posx,posy);
-				size++;
-				validate_size(size);
-				write_defaults_file(view_box, input_box, size);
-				button_focus = 1;
-				return 0;
-			}
-			case Get_id(button_shrink) : {
-				Get_widget_size(panel,posx,posy);
-				Get_widget_position(panel,posx,posy);
-				size--;
-				validate_size(size);
-				button_focus = (-1);
-				write_defaults_file(view_box, input_box, size);
-				return 0;
-			}
 		}
 	}
 	return(1);
 }
-void main(){
 
-	Integer x,y;
-	Integer size=2;
-	View_Box b1; Input_Box b2;
-	read_defaults_file(b1, b2, size);
-	validate_size(size);
-	Get_cursor_position(x,y);
-	Integer button_focus = 0;
-	while(1){
-		if (manage_a_panel(x,y,size,button_focus))break;
-	}
+void main(){
+	Print("VIEW-Model_Walk.4do by Paul Mashford\n");
+	manage_a_panel();
 }

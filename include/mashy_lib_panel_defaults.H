@@ -44,7 +44,8 @@ Text get_file_name_for_panel_read_write_settings(Panel &panel){
 
 Integer write_panel(Panel &panel, Text file_name, Integer verbose){
 	if(File_exists(file_name)){ // Write_SLX() will fail with a return error code 3 if the file exists, so attempt a file delete
-		if(verbose) Print("<File_delete("+file_name+")> with <ierr="+To_text(File_delete(file_name))+"> for wite_panel() update\n");
+		Integer ierr = File_delete(file_name);
+		if(verbose) Print("<File_delete("+file_name+")> with <ierr="+To_text(ierr)+"> for wite_panel() update\n");
 	}
 	Integer ierr = Write_SLX(panel,file_name);
 	if(verbose) Print("<"+file_name+">< Write_SLX() with ierr="+To_text(ierr)+">\n");
