@@ -6,7 +6,7 @@
 #include "mashy_lib_create_super.H"
 #include "12d/slf.H"
 
-#include "mashy_lib_xml_v10.H"
+//#include "mashy_lib_xml_v10.H"
 
 
 Integer draw_last_view(){

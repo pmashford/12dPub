@@ -681,7 +681,22 @@ Integer match_name(Dynamic_Text &dt, Text pat, Dynamic_Text &dtr){
 			count++;
 		}
 	}
+	return count;
+}
 
+Integer match_name_ignore_case(Dynamic_Text &dt, Text pat, Dynamic_Text &dtr){
+	Integer items;
+	Integer count = 0;
+	pat = Text_lower(pat);
+	Get_number_of_items(dt,items);
+	for (Integer i =1 ; i <= items ; i++){
+		Text t;
+		Get_item(dt,i,t);
+		if(Match_name(Text_lower(t),pat)!=0){
+			Append(t,dtr);
+			count++;
+		}
+	}
 	return count;
 }
 
