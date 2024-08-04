@@ -47,6 +47,10 @@ void matmul(Vector4 v[], Integer size, Matrix4 m){
     for(Integer i=1;i<=size;i++){   v[i] = m * v[i];    }   // matrix * v
 }
 
+void matmul(Vector3 v[], Integer size, Matrix4 m){
+    for(Integer i=1;i<=size;i++){   v[i] = m * v[i];    }   // matrix * v
+}
+
 void scale_vector(Vector4 v[], Integer size, Real scaler){
     Vector3 v3; Set_vector(v3,scaler,scaler,scaler);
     Matrix4 m_scale = Get_scaling_matrix(v3);
@@ -240,6 +244,14 @@ void test_mashy_lib_vectors_matrix(){
 p_m4 = get_projection_matrix(90,100,-200);
     Print();Print("Projection matrix\n");
     print(p_m4);
+
+    // casting - cant cast 2 levels
+    // Vector4 cv4; Set_vector(cv4,10,10,10,1);
+    // Vector2 cv2;
+    // cv2 = cv4;
+    // print(cv4);
+    // print(cv2);
+
 }
 
 #endif

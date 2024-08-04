@@ -61,10 +61,80 @@ Dynamic_Text GDAL_gdalinfo(Text gdalpath, Text filename, Text options)
     valid_path(gdalpath+"\\"+"gdalinfo.exe",gdalfile);
     Text command = quotes_add(gdalfile) + " " + quotes_add(filename) + " " + options;
     Dynamic_Text dt = run_system_command_get_output(command);
-    p(dt);
+    // p(dt);
     return dt;
 }
 
+Integer GDAL_get_coords_from_info(Text line, Real &value1, Real &value2){
+    Integer ret = 0;
+    Dynamic_Text parts;
+    From_text(line, '"', ' ' , parts);
+    Integer items;  Get_number_of_items(parts,items);
+    //Print(line + " ->"+To_text(items));Print();
+    if(items >= 5){
+        Text t1,t2;
+        Get_item(parts,1,t1);
+        Get_item(parts,2,t2);
+        t1+= " " + t2;
+        switch (Text_lower(t1)){
+            case ("upper left") : {
+                ret = 1;
+            }break;
+            case ("upper right") : {
+                ret = 2;
+            }break;
+            case ("lower right") : {
+                ret = 3;
+            }break;
+            case ("lower left") : {
+                ret = 4;
+            }break;
+            default :{
+                return 0;
+            }
+        }
+        Get_item(parts,4,t1);
+        Get_item(parts,5,t2);
+        t1 = Get_subtext(t1,1,Text_length(t1)-1);
+        t2 = Get_subtext(t2,1,Text_length(t2)-1);
+        Print(t1);Print();
+        Print(t2);Print();
+        if( From_text(t1,value1) ||From_text(t2,value2) ) return 0; // if an error abort
+    }
+    return ret; // all good here
+}
+
+Integer GDAL_get_coords_from_info(Dynamic_Text &info, Real x[], Real y[]){ // x[4],y[4] expected, and they will draw a bounding box UL -> UR -> LR -> LL
+    for(Integer i=1;i<=4;i++){
+        Null(x[i]); Null(y[i]); // init
+    }
+    Text line;
+    Integer items;  Get_number_of_items(info,items);
+    Integer ret = 0;
+    for(i=1;i<=items;i++){
+        Text t;
+        Get_item(info,i,t);
+        Real v1,v2;
+        Integer ierr = GDAL_get_coords_from_info(t,v1,v2);
+        if(ierr){
+            x[ierr] = v1;   y[ierr] = v2;
+            ret+=ierr;
+        }
+    }
+    if(ret == 10){
+        Print("...coords found\n");
+        return 0; // 10 means we found 1 + 2 + 3 + 4 indexes in the for loop
+    }else{
+        Print("NO COORDS FOUND!\n");
+    }
+    return 1;
+}
+
+Integer GDAL_get_coords(Text gdalpath, Text filename, Real x[], Real y[]){
+    Text options ;
+    Dynamic_Text info = GDAL_gdalinfo(gdalpath, filename, options);
+    return GDAL_get_coords_from_info(info, x, y);
+}
 
 Text element_coords_WKT(Element &e, Integer dec){
 
