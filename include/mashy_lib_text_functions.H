@@ -7,6 +7,14 @@
 //	#define mashy_lib_debug_included
 //#endif
 
+void append_start(Text value, Dynamic_Text &list){
+    Dynamic_Text list_2;
+    Append(list,list_2);
+    Null(list);
+    Append(value,list);
+    Append(list_2,list);
+    Null(list_2); //overkill, out of scope
+}
 
 // 12d's inbuilt Find_text() returns 1 when to_find == "" (https://beta.12dmodel.com/forums/viewtopic.php?p=86583)
 Integer find_text(Text t, Text to_find){
@@ -291,7 +299,10 @@ Integer get_all_brackets(Text &input, Dynamic_Text &dt_output)
 	#define REAL_JUSTIFY_DECIMALS 8
 #endif
 
-
+Text to_text(Real r,Integer padded_left_of_decimal, Integer decimals){
+    Text s = "%"+To_text(padded_left_of_decimal) + "." + To_text(decimals) + "f";
+    return To_text(r,s);
+}
 
 Text real_justify(Real r, Integer min_dec){
 #if 1

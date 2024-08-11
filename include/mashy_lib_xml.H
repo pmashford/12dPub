@@ -334,7 +334,33 @@ Integer set_xml_node_att(XML_Node &parent_node, Text xml_node_name, Text att_nam
 }
 
 Integer get_xml_document(Text filename, XML_Document &doc, XML_Node &root_node){
-	if(Read_XML_document(doc, filename) != 0 ) return (-1);
+	// dsfadsafkj;
+	// usage notes:
+	//	doc needs to exist as a valid XML_Document doc = Create_XML_document();
+	// -4 return on Real_XML_document means something invalid in the XML file, for example the node name could have invalid characters such as spaces <name 2>
+
+	Integer ierr;
+	// Integer type;
+	// ierr = Get_type(doc,type);	// NOTE: if ierr !=0 then can't trust type
+	// Print("=>doc has type ("+To_text(type)+") with Get_type() ierr of ("+To_text(ierr)+")\n");
+
+	if(!File_exists(filename)){
+		Print("XML file <"+filename+"> does not exist on disk!\n");
+	}
+	ierr = Read_XML_document(doc, filename);
+	if(ierr){
+		doc = Create_XML_document();
+		ierr = Read_XML_document(doc, filename);
+	}
+	if(ierr != 0 ){
+		Print("XML file exists <"+filename+">, but failed to open with ierr <"+ To_text(ierr)+">\n");
+		if(ierr == -4){
+			Print("... check for valid syntax, ie. do node names have spaces?\n");
+		}else{
+			Print("... check that doc object has been created... XML_Document doc = Create_XML_document(); _stated before_ Read_XML_document(doc, filename); _is called_\n");
+		}
+		return ierr;
+	}
 	if(Get_root_node(doc,root_node) != 0 ) return (-2);
 	return (0);
 }
