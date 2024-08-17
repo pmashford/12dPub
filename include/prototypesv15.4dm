@@ -7018,6 +7018,7 @@ Integer Set_border_style(Textstyle_Data textdata,Integer style); // ID = 7837
 Integer Is_null2(Real value); // ID = 7838
 Integer XY_inside_polygon(Element polygon,Real x,Real y,Integer &inside_status); // ID = 7839
 Integer Share_in_tin(Text project_path,Text tin_name,Text share_in_as,Text model_name,Integer use_relative_sharing,Tin &shared_in_tin,Text &return_message); // ID = 7840
+
 Integer Create_view_draw(Integer mode,View_Draw &created); // ID = 7845
 void Null(View_Draw &vd); // ID = 7846
 Integer Draw(View_Draw &vd); // ID = 7847
@@ -7028,12 +7029,14 @@ Integer Update_line(View_Draw &vd,Real xs,Real ys,Real xe,Real ye); // ID = 7851
 Integer Clear_data(View_Draw &vd); // ID = 7852
 Integer Highlight_line(View v,Integer colour,Real xs,Real ys,Real xe,Real ye); // ID = 7853
 Integer Unhighlight_line(View v,Real xs,Real ys,Real xe,Real ye); // ID = 7854
+
 Integer Set_root_node_final(XML_Document &doc,XML_Node &node); // ID = 7855
 Integer Append_node_final(XML_Node &parent,XML_Node &new_node); // ID = 7856
 Integer Chainage_height_profile(Element input_3d_string,Element &output_ch_h); // ID = 7857
 Integer Strings_from_sections(Model strings_model,Model sections_model,Text &error_message); // ID = 7858
 Integer Create_trimesh_from_polygon(Element polygon,Model trimesh_model,Text trimesh_name,Integer trimesh_colour,Real trimesh_offset,Real trimesh_depth,Integer do_holes,Model holes_model,Text holes_name,Integer holes_colour,Real holes_offset,Real holes_depth,Text &error_message); // ID = 7859
 Integer Trimesh_cookie_cut_by_polygon(Dynamic_Element &trimeshes,Element polygon,Model output,Integer mode); // ID = 7860
+
 Integer Highlight_create(); // ID = 7861
 Integer Highlight_remove(Integer id); // ID = 7862
 Integer Highlight_draw(Integer id); // ID = 7863
@@ -7046,6 +7049,7 @@ Integer Highlight_add_arc(Integer id,Integer colour,Real xs,Real ys,Real xe,Real
 Integer Highlight_add_string(Integer id,Integer colour,Element string); // ID = 7870
 Integer Highlight_add_text(Integer id,Integer colour,Real x,Real y,Textstyle_Data ts_data,Text text); // ID = 7871
 Integer Highlight_delete_all(); // ID = 7872
+
 Integer Get_macro_total_read_locks(Element elt,Integer &no_locks); // ID = 7873
 Integer Get_macro_total_write_locks(Element elt,Integer &no_locks); // ID = 7874
 Integer Register_On_Idle(User_Input_Replay &clicky); // ID = 7879

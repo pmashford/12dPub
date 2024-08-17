@@ -111,7 +111,7 @@ Textstyle_Data create_textstyle_data(){
 
     Textstyle_Data textdata;
 
-    Set_textstyle( textdata,"Arial"); // ID = 1652
+    Set_textstyle( textdata,"Arial Narrow"); // ID = 1652
     //Set_whiteout(textdata,Integer colour); // ID = 2753
     //Set_border(textdata,Integer colour); // ID = 2763
     //Set_border_style(textdata,Integer style); // ID = 7837

@@ -426,25 +426,93 @@ void node_to_text(XML_Node &node, Integer depth, Text &data){
 	if(t==""){
 		data+="</"+name+">";
 	}
-
 }
-void panel_node_to_text(XML_Node &node, Text &panel_name, Text &data){
-	Integer nnodes = Get_number_of_nodes(node);
-	Get_node_text(node,panel_name);
-	p(panel_name);
-	Integer depth = 0;
-	for(Integer i=1;i<=nnodes;i++){
+
+Integer has_doc_at_top_of_tree(XML_Node &node){ // blows up where XML_Node is not contained in a XML_Document
+	Print("\n\nhas_doc_at_top_of_tree()\n");
+	XML_Node parent = node;
+	Integer max_errors =0;
+	Integer count_errors = 0;
+	while(1){
+		Integer ierr;
+		ierr =  Get_parent_node(parent,parent); // ID = 2427
+		Integer type;
+		Get_type(parent,type);
+		Text name;
+		Get_node_name(parent,name);
+		Print("ierr=" +To_text(ierr)+" name=" +name+ " type="+To_text(type)+"\n");
+		if(ierr)count_errors++;
+		if(count_errors >= max_errors ) return 0;
+	}
+	return 0;
+}
+
+// https://beta.12dmodel.com/forums/viewtopic.php?t=18614
+// https://beta.12dmodel.com/forums/viewtopic.php?t=18615
+
+void node_to_text_data(XML_Node &node, Text &data){		// TODO - handle attributes and declaration
+	Text name="",t="";
+	Get_node_name(node,name);
+	if(Get_node_text(node,t))t="";	//
+	data+="<"+name+">"+t;
+	Integer n_nodes = Get_number_of_nodes(node);
+	for(Integer i=1;i<=n_nodes;i++){	// 
 		XML_Node child;
 		Get_child_node(node,i,child);
-		node_to_text(child,depth+1,data);
+		Integer type;	Get_type(child,type);
+		if(i==1 && type == 4){ 
+			Text name2;
+			Get_node_name(child,name2);
+			data +=name2;
+		}else{
+			node_to_text_data(child,data);
+		}
 	}
+	data+="</"+name+">";
+}
+
+Integer prep_node_for_parsing_XML_tree(XML_Node &node){ //https://beta.12dmodel.com/forums/viewtopic.php?t=18614
+	XML_Document doc = Create_XML_document();
+	XML_Node root = Create_node("root");
+	Set_root_node(doc,root);
+	Integer ierr = Append_node_final(root,node); // if it errors then node is already in a doc, either way node should be a member of a doc and accessible
+	return ierr ? 0 : 1; // 0 means was already in a doc, 1 means hacky doc was used (note: goes out of scope)
+}
+
+Text node_to_text_data(XML_Node &node){
+	// XML_Document doc = Create_XML_document();
+	// XML_Node root = Create_node("root");
+	// Set_root_node(doc,root);
+	// if(Append_node_final(root,node)){ // if it errors then node is already in a doc, either way node should be a member of a doc and accessible
+	// }
+	Integer ierr = prep_node_for_parsing_XML_tree(node);
+	// Print("RAD ierr="+To_text(ierr)+"\n");
+	Text data;
+	node_to_text_data(node, data);
+	return data;
+
+}
+
+void panel_node_to_text(XML_Node &node, Text &panel_name, Text &data){
+	// Integer nnodes = Get_number_of_nodes(node);
+	Get_node_text(node,panel_name);
+	p(panel_name);
+	// Integer depth = 0;
+	// for(Integer i=1;i<=nnodes;i++){
+	// 	XML_Node child;
+	// 	Get_child_node(node,i,child);
+	// 	node_to_text(child,depth+1,data);
+	// }
 	Print("DEBUG================\n");
-	Print(data);Print();	
+	// Print(data);Print();	
+	data = node_to_text_data(node);
+	Print(data+"\n");
 	Print("DEBUG================\n");
 }
 
 
 void debug_node(XML_Node &node){
+	prep_node_for_parsing_XML_tree(node);
 	debug_node(node,1);
 }
 
