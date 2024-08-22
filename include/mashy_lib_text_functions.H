@@ -1,7 +1,12 @@
 #ifndef mashy_lib_text_functions_included
 #define mashy_lib_text_functions_included
 
-
+#ifndef DELTA_CHAR
+#define DELTA_CHAR "\x0394"
+#endif
+#ifndef DIAMETER_CHAR
+#define DIAMETER_CHAR "\x00D8"
+#endif
 //#ifndef mashy_lib_debug_included
 	#include "mashy_lib_debug.H"
 //	#define mashy_lib_debug_included

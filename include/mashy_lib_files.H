@@ -555,6 +555,12 @@ Integer read_file(Text file_name,Dynamic_Text &file_contents ){
 	return(0);
 }
 
+Dynamic_Text read_file(Text file_name){
+	Dynamic_Text file_contents;
+	read_file(file_name, file_contents );
+	return file_contents;
+}
+
 Integer open_file_write_list(Text file_name,Dynamic_Text &contents_byline)
 {
 //function to save the contyents of a dynamic list to a text file
