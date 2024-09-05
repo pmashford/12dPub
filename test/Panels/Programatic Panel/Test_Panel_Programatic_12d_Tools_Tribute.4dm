@@ -1,6 +1,17 @@
 #define PANEL_EXPOSE_AUTO_HIDE 1
 #include "mashy_lib_widgets_panel_handler_std.H"
 
+
+
+Integer handle_picks(Text this_command, Dynamic_Text args){
+
+    // Element e;
+
+    return 0;
+}
+
+
+
 Integer display_12d_panel_leave_open(Text panel_name){
 	Text path;  	Get_temporary_project_directory(path);      Text file_name = path+"/delete_me.slx";     // build a temp filename
     File f;
@@ -48,6 +59,10 @@ void test_custom_panel(){
     add_cmd(buttons_top,"View...",                  "Panel\tView");          
     add_cmd(buttons_top,"Create...",                "Panel\tCreate");
     add_cmd(buttons_top,"Edit...",                  "Panel\tEdit");
+    add_cmd(buttons_top,"Tins...",                  "Panel\tTins"); //NEW ELEMENT
+
+    add_cmd(buttons_top,"Tins\\Drape Verticies",          "Request Tin\tPick Element\tDrape Verticies");    // TODO - can we chain a series of things? , there are new SLX commands to do this through panels
+    add_cmd(buttons_top,"Tins\\Drape Normal",          "Request Tin\tPick Element\tDrape Normal");
 
     add_cmd(buttons_top,"Inquire/Measure\\String Inquire",          "12d\tString Inquire");
     add_cmd(buttons_top,"Inquire/Measure\\Measure Brg/Dst",         "12d\tMeasure Bearing/Distance");
