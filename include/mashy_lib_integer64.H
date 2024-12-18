@@ -73,9 +73,87 @@
 #define BIT61 1152921504606846976LL
 #define BIT62 2305843009213693952LL
 #define BIT63 4611686018427387904LL
-#define BIT64 -9223372036854775808LL
+// #define BIT64 -9223372036854775808LL // compiler doesn't like this, use hack next line
+#define BIT64 (-9223372036854775807LL-1LL)
 
 #define FULL32BITS 0xFFFFFFFF
+#define FULL64BITS -4294967297LL
+
+#if 1
+
+// toggle 1 for newer way - still broken
+void set_i64_to_i32i32(Integer64 &i64, Integer &l, Integer &r){
+	l = 0; //left 32 bits
+	r = 0; //right 32 bits
+	Integer64 b[63];
+	b[1] = 1;
+	for(Integer i=2;i<=63;i++){ // create the divisors for each bit
+		b[i] = b[i-1] + b[i-1];
+	}
+	Integer is_neg = 0;
+	Integer is_64 = 0;
+	if(i64>2147483647 || i64<-2147483648)is_64=1;
+	Integer64 remainder = i64;
+	if (remainder<0){
+		is_neg = 1;
+		l = -2147483648; // min 32bit integer
+		remainder+=9223372036854775807LL; // ensure number is positive... now negative numbers bits have been switched
+		remainder+=1LL;
+	}
+	
+	for(i=63;i>32;i--){
+		Integer64 is_set = remainder / (b[i]); // is_set is true when the remainder is >= to the bit we're checking, but need to flip is_set we started with a negative
+		remainder = remainder - (is_set * b[i]); // take it away for next iteration
+		is_set = (is_neg && is_64) ? 1 - is_set : is_set; // swap if starting from negative
+		if(is_set){
+			// Print(i64);Print(" boo 1\n");
+			Integer itype = b[i-32];
+			//l = l & itype; // bitwise &
+			l += itype; // 
+		}
+	}
+	// now do right, but 32nd bit is a special case
+	do{
+		Integer64 is_set = remainder / (b[32]); // is_set is true when the remainder is >= to the bit we're checking, but need to flip is_set we started with a negative
+		remainder = remainder - (is_set * b[32]); // take it away for next iteration
+		is_set = (is_neg) ? 1 - is_set : is_set; // swap if starting from negative
+		if(is_set){
+			// Print(i64);Print(" boo 2\n");
+			r = -2147483648; //
+		}
+	}while (0);
+	for(i=31;i>0;i--){
+		Integer64 is_set = remainder / (b[i]); // is_set is true when the remainder is >= to the bit we're checking, but need to flip is_set we started with a negative
+		remainder = remainder - (is_set * b[i]); // take it away for next iteration
+		is_set = (is_neg) ? 1 - is_set : is_set; // swap if starting from negative
+		if(is_set){
+			// Print(i64);Print(" boo 3\n");
+			Integer itype = b[i];
+			// r = r & itype; // bitwise &?
+			r += itype; //
+		}
+	}
+	if(is_neg){
+		r*=(-1);
+		r--;
+		//l;
+	}
+	// i think we're good??
+}
+
+void test_set_i64_to_i32i32(){
+	Integer64 i64=0;
+	Integer l,r;
+
+	for(Integer i=0;i<=64;i++){
+		if (i == 1) i64 =(1);
+		i64 = i64 + i64;
+		set_i64_to_i32i32(i64, l, r);
+		Print(i64);Print(" : ");Print(l);Print(" , ");Print(r);Print("\n");
+	}
+}
+
+#else
 
 void set_i64_to_i32i32(Integer64 &i, Integer &x, Integer &y){
 	Integer64 result64 = i / BIT33;
@@ -83,12 +161,41 @@ void set_i64_to_i32i32(Integer64 &i, Integer &x, Integer &y){
 	y = remainder64;
 	x = result64;
 }
+#endif
 
+#if 1
+// toggle 1 for newer way - still broken
+void set_i32i32_to_i64(Integer &x, Integer &y, Integer64 &i64){
+	i64 = 0;
+	Integer64 v64[63];
+	Integer b[31];
+	b[1] = 1;
+	for(Integer i=2;i<=31;i++){ // stuff
+		b[i] = b[i-1] + b[i-1];
+		v64[i] = b[i];
+	}
+	for(i=32;i<=63;i++){ // continue 64 bit values
+		v64[i] = v64[i-1] +v64[i-1];
+	}
+
+	for(i=1;i<=31;i++){
+		if(y&b[i])i64+=v64[i];
+		if(x&b[i])i64+=v64[i+32];
+	}
+	if(y<0)i64+=v64[32];
+	if(x<0){
+		i64= i64 - 9223372036854775807LL;
+		i64--;
+	}
+
+}
+#else
 void set_i32i32_to_i64(Integer &x, Integer &y, Integer64 &i){
 	Integer64 yy = y;
 	Integer64 b=x;
 	i = b * BIT33 + yy;
 }
+#endif
 
 void make_bits(){
 	Integer64 b = 1;
@@ -272,7 +379,8 @@ Integer64 bitwise_unary_complement(Integer64 &a){ // _FLIP_ the bits of a  /////
 //	Integer c1 = (~a1);
 //	Integer c2 = (~a2);
 
-	Integer c1 = (a1 ^ (FULL32BITS));
+	//what about c1 = (-1) * a1 - 1;
+	Integer c1 = (a1 ^ (FULL32BITS)); 
 	Integer c2 = (a2 ^ (FULL32BITS));
 
 	Integer64 i;
@@ -296,21 +404,23 @@ void test_bitwise(){
 	test_bitwise_inclusive_or(LARGE_POSITIVE,55);
 	test_bitwise_inclusive_or(BIT55,BIT55);
 	test_bitwise_inclusive_or(1,2);
-	test_bitwise_inclusive_or(BIT56,BIT56+1);
-	test_bitwise_inclusive_or(BIT1|BIT2|BIT3|BIT4|BIT5|BIT6|BIT7|BIT8|BIT9|BIT10|BIT11|BIT12|BIT13|BIT14|BIT15,BIT56+1);
+	test_bitwise_inclusive_or(BIT56,BIT56+1LL);
+	test_bitwise_inclusive_or(BIT1|BIT2|BIT3|BIT4|BIT5|BIT6|BIT7|BIT8|BIT9|BIT10|BIT11|BIT12|BIT13|BIT14|BIT15,BIT56+1LL);
 	test_bitwise_inclusive_or(BIT64,BIT56);	//ISSUES HERE
 	Print("\n[test_bitwise_exclusive_or |]"+"\n");
 	test_bitwise_exclusive_or(LARGE_POSITIVE,55);
 	test_bitwise_exclusive_or(BIT55,BIT55);
 	test_bitwise_exclusive_or(1,2);
-	test_bitwise_exclusive_or(BIT56,BIT56+1);
-	test_bitwise_exclusive_or(BIT1|BIT2|BIT3|BIT4|BIT5|BIT6|BIT7|BIT8|BIT9|BIT10|BIT11|BIT12|BIT13|BIT14|BIT15,BIT56+1);
+	test_bitwise_exclusive_or(BIT56,BIT56+1LL);
+	test_bitwise_exclusive_or(BIT1|BIT2|BIT3|BIT4|BIT5|BIT6|BIT7|BIT8|BIT9|BIT10|BIT11|BIT12|BIT13|BIT14|BIT15,BIT56+1LL);
 	test_bitwise_exclusive_or(BIT64,BIT56);	//ISSUES HERE
 	Print("\n[test_bitwise_unary_complement |]"+"\n");
 	test_bitwise_unary_complement(LARGE_POSITIVE);
 	test_bitwise_unary_complement(0);
 	test_bitwise_unary_complement(BIT1|BIT2|BIT3|BIT4|BIT5|BIT6|BIT7|BIT8|BIT9|BIT10|BIT11|BIT12|BIT13|BIT14|BIT15);
 	test_bitwise_unary_complement(10);
+
+
 
 	test_bitwise_unary_complement(BIT64);	//ISSUES HERE... 64th and 32nd bits
 }

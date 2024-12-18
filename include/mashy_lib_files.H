@@ -262,6 +262,8 @@ Text get_file_path_filename(Text full_path){
 
 Integer get_file_path_filename(Text full_path,Text &path, Text &file){
 //uses function overload, get just the file name from a path
+	path = ""; // init, fix bug when this function gets called twice
+	file = "";
 	Dynamic_Text parts;
 	Integer i = get_file_path_parts(full_path,parts);
 	if(i!=0){
