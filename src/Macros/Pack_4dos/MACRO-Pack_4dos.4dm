@@ -75,5 +75,5 @@ void go_panel(){
 }
 
 void main(){
-    go_panel();
+	go_panel();
 }

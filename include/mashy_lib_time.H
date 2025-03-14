@@ -1,6 +1,47 @@
 #ifndef mashy_lib_time_h_included
 #define mashy_lib_time_h_included
 
+
+Integer is_leap_year(Integer YYYY){ // tested
+  if( ( (YYYY % 4 == 0) && (YYYY % 100 != 0) ) || (YYYY % 400 == 0) ){
+    return 1;
+  }
+  return 0;
+}
+
+// Given a date + time, return seconds since Jan 1 1970 ... TESTED OK
+Integer time_from(Integer year, Integer month, Integer day, Integer hrs, Integer mins, Integer secs){
+  if(year < 1970) return -1; // crap data, return error
+  Integer days=0;
+  days = (year - 1970) * 365; // handle years
+
+  switch ( month) {              // handle months
+    case 1  :{ days += 0;}break;
+    case 2  :{ days += 31;}break;
+    case 3  :{ days += 59;}break;
+    case 4  :{ days += 90;}break;
+    case 5  :{ days += 120;}break;
+    case 6  :{ days += 151;}break;
+    case 7  :{ days += 181;}break;
+    case 8  :{ days += 212;}break;
+    case 9  :{ days += 243;}break;
+    case 10 :{ days += 273;}break;
+    case 11 :{ days += 304;}break;
+    case 12 :{ days += 334;}break;
+  }
+  // handle leap years... how many 29th of Febs have been
+  if(month <= 2){
+    year = year - 1;  // workings for leap days
+  }
+  for(Integer i = 1970 ; i <= year ; i++){
+    days += is_leap_year(i);
+  }
+  days += day-1;
+
+  return (days * 24 * 60 * 60) + (hrs * 60 * 60) + (mins * 60) + secs;
+}
+
+
 // http://www.cplusplus.com/reference/ctime/strftime/
 
 //from a mike jensen example (xml calls)

@@ -36,24 +36,34 @@ if exist "C:\Program Files\12d\12dmodel\15.00\nt.x64\12d.exe" set where=C:\Progr
 
 echo compiling %fullpath% using %where% 
 
-REM START code to get QUOTED_CC4D_VERSION_DATA 
+REM START code to get QUOTED_CC4D_VERSION_DATA (send errors to file to capture the version data for cc4d.exe)
 set ERRORFILE=C:\TEMP\temp_cmd_redirect_errors.txt
 "%where%\cc4d.exe" 2> %ERRORFILE%
 set "QUOTED_CC4D_VERSION_DATA="
 for /f "delims=" %%a in ('type %ERRORFILE% ^| findstr "^Version"') do (
     set "QUOTED_CC4D_VERSION_DATA=%%a"
 )
+
+for /f "tokens=2,4,6 delims= " %%a in ("%QUOTED_CC4D_VERSION_DATA%") do (
+    set "MACRO_VERSION_4D=%%a"
+    set "MACRO_LAST_OPCODE_4D=%%b"
+    set "MACRO_LAST_LIBRARY_CODE_4D=%%c"
+)
+
 echo:
 echo CC4D.exe version information accessable from custom environment variable QUOTED_CC4D_VERSION_DATA
 echo where QUOTED_CC4D_VERSION_DATA = "%QUOTED_CC4D_VERSION_DATA%"
+echo where MACRO_VERSION_4D = "%MACRO_VERSION_4D%"
+echo where MACRO_LAST_OPCODE_4D = "%MACRO_LAST_OPCODE_4D%"
+echo where MACRO_LAST_LIBRARY_CODE_4D = "%MACRO_LAST_LIBRARY_CODE_4D%"
 echo:
 del %ERRORFILE%
 REM END code to get QUOTED_CC4D_VERSION_DATA 
 
 cd /d "%filePath%"
 
-rem ! DONT LOG TO FILE, LET VSCODE DO FROM STDERR? set mycmd="%where%\cc4d.exe" -log X:\12d\Temp\temp.4dl "%fullpath%"  -allow_old_calls -D"QUOTED_CC4D_VERSION_DATA=\"\\\"%QUOTED_CC4D_VERSION_DATA%\\\"\""
-set mycmd="%where%\cc4d.exe" "%fullpath%" -allow_old_calls -D"QUOTED_CC4D_VERSION_DATA=\"\\\"%QUOTED_CC4D_VERSION_DATA%\\\"\""
+rem pass in macros with -D
+set mycmd="%where%\cc4d.exe" "%fullpath%" -allow_old_calls -D"QUOTED_CC4D_VERSION_DATA=\"\\\"%QUOTED_CC4D_VERSION_DATA%\\\"\"" -DMACRO_VERSION_4D=%MACRO_VERSION_4D% -DMACRO_LAST_OPCODE_4D=%MACRO_LAST_OPCODE_4D% -DMACRO_LAST_LIBRARY_CODE_4D=%MACRO_LAST_LIBRARY_CODE_4D%
 %mycmd%
 echo %mycmd%
 
