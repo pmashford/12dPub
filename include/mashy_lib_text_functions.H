@@ -163,6 +163,29 @@ Integer is_whitespace(Integer c){
     return(0);
 }
 
+Integer is_special(Integer c){
+    if (c >= '!' && c <= '/'){
+        return(1);
+    }
+    if (c >= ':' && c <= '@'){
+        return(1);
+    }
+    if (c >= '[' && c <= '`'){
+        return(1);
+    }
+    if (c >= '{' && c <= '~'){
+        return(1);
+    }
+    return(0);
+}
+
+Integer is_number(Integer c){
+    if(c>='0' && c<='9'){
+        return(1);
+    }
+    return(0);
+}
+
 //remove leading and trailing whitespace
 Text text_justify(Text t){
 	Integer end = Text_length(t);
@@ -201,6 +224,85 @@ Dynamic_Text text_justify(Dynamic_Text &dt){
 		Append(t,dt2);
 	}
 	return(dt2);
+}
+
+
+Text text_upper(Text t){
+	Integer i=1;
+	Integer c;
+	while(!Get_char(t,i,c)){
+		if(c>='a' && c<='z'){
+            Set_char(t,i,c^(0x20)); // 6th bit must be set to convert to uppercase
+		}
+        i++;
+	}
+	return t;
+}
+
+Text text_lower(Text t){
+	Integer i=1;
+	Integer c;
+	while(!Get_char(t,i,c)){
+		if(c>='A' && c<='Z'){
+            Set_char(t,i,c^(0x20)); // 6th bit must be set to convert to uppercase
+		}
+        i++;
+	}
+	return t;
+}
+
+Text text_swap_case(Text t){
+	Integer i=1;
+	Integer c;
+	while(!Get_char(t,i,c)){
+		if(c>='A' && c<='Z'){
+            Set_char(t,i,c^(0x20)); // 6th bit must be set to convert to uppercase
+		}else if(c>='a' && c<='z'){
+            Set_char(t,i,c^(0x20)); // 6th bit must be set to convert to uppercase
+        }
+        i++;
+	}
+	return t;
+}
+
+Text text_title_case(Text t){
+	Integer i=1;
+	Integer c,capitalise_next=1; //cp is previous character and will be set to 1 if previous character is whitespace
+	while(!Get_char(t,i,c)){
+        if(c>='A' && c<='Z'){
+            if(!capitalise_next){
+                Set_char(t,i,c^(0x20)); // 6th bit must be swapped
+            }
+		}else if(c>='a' && c<='z'){
+            if(capitalise_next){
+                Set_char(t,i,c^(0x20)); // 6th bit must be swapped
+            }
+        }
+        capitalise_next = is_whitespace(c) | is_special(c) | is_number(c);
+        i++;
+	}
+	return t;
+}
+
+Text text_sentance_case(Text t){
+	Integer i=1;
+	Integer c,cp=1; //cp is previous character and will be set to 0 if previous character is whitespace
+	while(!Get_char(t,i,c)){
+        if(c>='A' && c<='Z'){
+            if(!cp){
+                Set_char(t,i,c^(0x20)); // 6th bit must be swapped
+            }
+		}else if(c>='a' && c<='z'){
+            if(cp){
+                Set_char(t,i,c^(0x20)); // 6th bit must be swapped
+            }
+        }
+
+        cp = is_whitespace(c);
+
+        i++;
+	}
+	return t;
 }
 
 /* SHITTY OLD CALL
