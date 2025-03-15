@@ -115,36 +115,77 @@ Text confirm_last_character(Text t, Text desired_last_char){
 	return t+desired_last_char;
 }
 
-Text text_justify(Text txt){
-//remove leading and trailing spaces and tabs
-	Integer m1 = '\t';
-	Integer m2 = ' ';
-	Integer length = Text_length(txt);
+// SPACE \x0020
+// NO-BREAK SPACE \x00A0
+// CHARACTER TABULATION \x0009
+// LINE FEED \x000A
+// LINE TABULATION \x000B
+// FORM FEED \x000C
+// CARRIAGE RETURN \x000D
+// NEXT LINE \x0085
+#ifndef WHITESPACE
+#define WHITESPACE "\x0020\x00A0\x0009\x000A\x000B\x000C\x000D\x0085"
+#endif
+
+// OGHAM SPACE MARK \x1680
+// EN QUAD \x2000
+// EM QUAD \x2001
+// EN SPACE \x2002
+// EM SPACE \x2003
+// THREE-PER-EM SPACE \x2004
+// FOUR-PER-EM SPACE \x2005
+// SIX-PER-EM SPACE \x2006
+// FIGURE SPACE \x2007
+// PUNCTUATION SPACE \x2008
+// THIN SPACE \x2009
+// HAIR SPACE \x200A
+// NARROW NO-BREAK SPACE \x202F
+// MEDIUM MATHEMATICAL SPACE \x205F
+// IDEOGRAPHIC SPACE \x3000
+// LINE SEPARATOR character \x2028
+// PARAGRAPH SEPARATOR character \x2029
+#ifndef WHITESPACE2
+#define WHITESPACE2 "\x1680\x2000\x2001\x2002\x2003\x2004\x2005\x2006\x2007\x2008\x2009\x200A\x202F\x205F\x3000\x2028\x2029"
+#endif
+
+Integer is_whitespace(Integer c){
+    switch (c){
+        case 0x0020 : case 0x0020 : case 0x00A0 : case 0x0009 : case 0x000A : case 0x000B : case 0x000C : case 0x000D : case 0x0085 : {
+            return(1);
+        }
+        case 0x1680 :case 0x2000 :case 0x2001 :case 0x2002 :case 0x2003 :case 0x2004 :case 0x2005 :case 0x2006 :case 0x2007 :case 0x2008 :case 0x2009 :case 0x200A :case 0x202F :case 0x205F :case 0x3000 :case 0x2028 :case 0x2029 : {
+            return(1);
+        }
+        default : {
+            return(0);
+        }
+    }
+    return(0);
+}
+
+//remove leading and trailing whitespace
+Text text_justify(Text t){
+	Integer end = Text_length(t);
+    if(end < 1)return"";
 	Integer start = 1;
-	Integer end = length;
-	if(length == 0)return"";
-	while (1){
-		if(start >length)return"";
-		Integer c1;
-		Get_char(txt,start,c1);
-		if(c1 == m1 || c1 == m2){
+    Integer c;
+	while (start <= end){
+		Get_char(t,start,c);
+		if(is_whitespace(c)){
 			start++;
 		}else{
 			break;
 		}
 	}
-	while (1){
-		if(end == 0)return"";
-		Integer c1;
-		Get_char(txt,end,c1);
-		if(c1 == m1 || c1 == m2){
+	while (end > start){
+		Get_char(t,end,c);
+		if(is_whitespace(c)){
 			end--;
 		}else{
 			break;
 		}
 	}
-	if( (end-start) < 0)return"";
-	return Get_subtext(txt,start,end);
+	return Get_subtext(t,start,end);
 }
 
 Dynamic_Text text_justify(Dynamic_Text &dt){
