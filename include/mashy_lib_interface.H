@@ -1,16 +1,16 @@
 #ifndef mashy_lib_interface_h_included
 #define mashy_lib_interface_h_included
 
-#include "X:\12d\MACROS\_INCLUDES\set_ups.h"
-#include "X:\12d\MACROS\_INCLUDES\standard_library.h"
-#include "X:\12d\MACROS\_INCLUDES\mashy_lib_element_functions.H"
-#include "X:\12d\MACROS\_INCLUDES\mashy_lib_geometry.H"
+#include "12d/set_ups.h"
+#include "12d/standard_library.h"
+#include "mashy_lib_element_functions.H"
+#include "mashy_lib_geometry.H"
 
 Element create_string_to_interface_from(Real x, Real y, Real z, Real dir){
 // auxillary function
 	Point start, end;
 	Set_x(start,x);		Set_y(start,y);	Set_z(start,z);
-	Real distance = 1.0; // changed from 1
+	Real distance = 1.0;
 	Locate_point(start,dir,distance,end);
 	Element section = Create_2d(2);
 	Set_2d_data(section,1,Get_x(start),Get_y(start));
@@ -34,7 +34,7 @@ Element create_interface_section(Real x, Real y, Real z, Real xf, Real yf, Real 
 
 Element interface(Real x, Real y, Real z, Real dir, Tin tin, Real cut_slope, Real fill_slope, Real search_dist, Real &xf, Real &yf, Real &zf, Integer &cut_or_fill){
 // Interface from a point with a direction => return the interface section, and some info (x,y,z) about the point
-// cut_or_fill not yet implemented, but cut will be -1, fill will be 1, 0 ther was an error
+// cut_or_fill not yet implemented, but cut will be -1, fill will be 1, 0 there was an error
 // + creating a bit of junk so hoping for a BER => http://beta.12dmodel.com/forums/viewtopic.php?t=2728&sid=31329ef6593cc68facf9aa724ebbb732
 // + could maybe say if it was cut or fill
 // + atts?

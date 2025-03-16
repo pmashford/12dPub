@@ -38,7 +38,8 @@ Integer time_from(Integer year, Integer month, Integer day, Integer hrs, Integer
   }
   days += day-1;
 
-  return (days * 24 * 60 * 60) + (hrs * 60 * 60) + (mins * 60) + secs;
+  //return (days * 24 * 60 * 60) + (hrs * 60 * 60) + (mins * 60) + secs;
+  return (days * 86400) + (hrs * 3600) + (mins * 60) + secs;
 }
 
 
