@@ -50,6 +50,23 @@ Integer must_exist(Model_Box box, Model &model, Text &model_name, Message_Box me
 	return (0); //success
 }
 
+Integer check_name(Model_Box box, Text &model_name, Message_Box message){
+	Model model;
+	Integer ierr = Validate(box,NEW_MODEL,model);
+	if(ierr!=MODEL_EXISTS){
+		if (ierr==NO_NAME){
+			Set_data(message,"Model name is blank!");
+			set_focus(box);
+			return(NO_NAME);
+		}
+		Set_data(message,"Model does not exist, will create");
+		return(0);
+	}
+	if(Get_name(model,model_name))return(1);
+	Set_data(message,"Model ok");
+	return (0); //success
+}
+
 Integer check_exist_create(Model_Box box, Model &model, Text &model_name, Message_Box message){
 // validates a model box, makes sure the model exists
 // 1 = error

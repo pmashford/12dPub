@@ -1324,6 +1324,11 @@ Integer get_data(Element &e, Real x[], Real y[], Real z[], Integer max_pts, Inte
 	Get_type(e,type);
 
 	switch (type){
+		case ("Super") : {
+			Real r[max_pts];
+			Integer f[max_pts];
+			return Get_super_data(e,x,y,z,r,f,max_pts,num_pts);
+		} break;
 		case ("String_Cloud") : {
 			Get_points(e,num_pts);
 			if(max_pts<num_pts)num_pts = max_pts;
@@ -1354,9 +1359,10 @@ Integer get_data(Element &e, Real x[], Real y[], Real z[], Integer max_pts, Inte
 			Integer f[max_pts];
 			Get_super_data(e,x,y,z,r,f,max_pts,num_pts);
 			for(Integer i=1;i<=max_pts;i++){
-				Real xf,yf,zf,ch,dir,off;
-				Drop_point(e,x[i],y[i],zf,xf,yf,z[i],ch,dir,off);
+				Real xf,yf,ch,dir,off;
+				Drop_point(e,x[i],y[i],0.0,xf,yf,z[i],ch,dir,off);	// get z's
 			}
+			Element_delete(horiz);
 		} break;
 		case ("Alignment") : {
 // hmmm
@@ -1367,7 +1373,7 @@ Integer get_data(Element &e, Real x[], Real y[], Real z[], Integer max_pts, Inte
 			ok+=Get_arc_start(e,x[1],y[1],z[1]);
 			num_pts = 1;
 			if(max_pts>=2){
-				ok+=Get_arc_start(e,x[2],y[2],z[2]);
+				ok+=Get_arc_end(e,x[2],y[2],z[2]);
 				num_pts = 2;
 			}
 			return ok;
@@ -1409,15 +1415,9 @@ Integer get_data(Element &e, Real x[], Real y[], Real z[], Integer max_pts, Inte
 			num_pts = 1;
 			Get_feature_centre(e,x[1],y[1],z[1]);
 		} break;
-		case ("Super") : {
-			Real r[max_pts];
-			Integer f[max_pts];
-			return Get_super_data(e,x,y,z,r,f,max_pts,num_pts);
-		} break;
-
 
 		default : {
-			Print("! internal routine does not recogise string type [cry face] <"+type+"> [FILE:mashy_lib_element_functions.H, CALL:get_data() LINE:"+To_text(__LINE__)+"]\n");
+			Print("! internal routine does not recogise string type [ :( ] <"+type+"> [FILE:mashy_lib_element_functions.H, CALL:get_data() LINE:"+To_text(__LINE__)+"]\n");
 		} break;
 	}
 	return 1;
