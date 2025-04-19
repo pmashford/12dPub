@@ -129,6 +129,14 @@ Integer check(Tin_Box box, Tin &tin, Text &tin_name, Message_Box message){
 	return(0);
 }
 
+Integer set_data(Tin_Box box, Text name){
+	if(Tin_exists(name)){
+		Set_data(box,name);
+		return(0);
+	}
+	return(1);
+}
+
 
 //	DIRECTORY BOX
 Integer must_exist(Directory_Box box, Text &folder, Message_Box message){

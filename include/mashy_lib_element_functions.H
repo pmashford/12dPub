@@ -457,6 +457,13 @@ Text get_element_name(Element &e){
 	return t;
 }
 
+Text get_name(Element &e){
+	//return the name of the element as text
+		Text t;
+		Get_name(e,t);
+		return t;
+	}
+
 Text get_element_model(Element &e){
 //return the name of the model which element is in
 	Text tm;
@@ -692,6 +699,37 @@ Integer append_unique_elements_from_mask(Dynamic_Text &model_masks, Dynamic_Text
 		Get_item(model_masks,i,model_mask);
 		Get_item(element_masks,i,element_mask);
 		ok+=append_unique_elements_from_mask( model_mask, element_mask, delt);
+	}
+	return ok;
+}
+
+Integer append_unique_elements_from_mask(Element &seed, Dynamic_Text &model_masks, Dynamic_Text &element_masks, Dynamic_Text &group_id_list, Dynamic_Element &delt){
+	// uses the group_id - the first group id in the list is used to then use that ID to go and find matching group ids to build the list of elements
+	Text seed_model_name = get_element_model(seed);
+	Text seed_element_name = get_element_name(seed);
+	Text seed_id;
+	Integer items=0;
+	Get_number_of_items(model_masks,items);
+	Integer ok=0;
+	for(Integer i=1;i<=items;i++){
+		Text model_mask="",element_mask="";
+		Get_item(model_masks,i,model_mask);
+		Get_item(element_masks,i,element_mask);	if(element_mask == ""){	element_mask = "*";	}
+
+		if( Match_name(seed_model_name,model_mask) && Match_name(seed_element_name,element_mask) ){
+			Get_item(group_id_list,i,seed_id);
+			for(Integer j=1;j<=items;j++){
+				Text group_id="";
+				Get_item(group_id_list,j,group_id);
+				if( Match_name(group_id,seed_id) ){
+					Get_item(model_masks,j,model_mask);
+					Get_item(element_masks,j,element_mask);	if(element_mask == ""){	element_mask = "*";	}
+					// Print("j="+To_text(j)+", id="+seed_id+" mask <"+model_mask+","+element_mask+">\n");
+					ok+=append_unique_elements_from_mask( model_mask, element_mask, delt);
+				}
+			}
+			break;
+		}
 	}
 	return ok;
 }
