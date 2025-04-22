@@ -69,6 +69,45 @@ void rotate_vector(Vector4 v[], Integer size, Real x, Real y, Real z, Real angle
     matmul( v,size,m_rot);
 }
 
+// NOTE: AM SCALING THE TRANSLATION VECTOR BY THE SCALER
+Matrix4 get_rotate_scale_translate_matrix(Vector3 rotate_axis, Real rotate_angle, Real scaler, Vector3 translate_v3){ // TODO - test
+    Matrix4 m_rot = Get_rotation_matrix(rotate_axis,rotate_angle);
+    Vector3 v3; Set_vector(v3,scaler,scaler,scaler);
+    Matrix4 m_scale = Get_scaling_matrix(v3);
+    translate_v3 = translate_v3/scaler;
+    Matrix4 m_tran = Get_translation_matrix(translate_v3);
+    return m_rot * m_scale * m_tran; // order is important
+}
+Matrix4 get_rotate_scale_translate_matrix(Real rax, Real ray, Real zay, Real rotate_angle, Real scaler, Real dx, Real dy, Real dz){ // TODO - test
+    Vector3 rotate_axis;
+    Set_vector(rotate_axis,rax,ray,zay); // rotate axis
+    Vector3 translate_v3;
+    Set_vector(translate_v3,dx,dy,dz); // translation vector
+    return get_rotate_scale_translate_matrix(rotate_axis, rotate_angle, scaler, translate_v3);
+}
+
+Matrix4 get_rotate_scale_matrix(Vector3 rotate_axis, Real rotate_angle, Real scaler){ // TODO - test
+    Matrix4 m_rot = Get_rotation_matrix(rotate_axis,rotate_angle);
+    Vector3 v3; Set_vector(v3,scaler,scaler,scaler);
+    Matrix4 m_scale = Get_scaling_matrix(v3);
+    return m_rot * m_scale; // order is important
+}
+Matrix4 get_rotate_scale_matrix(Real rax, Real ray, Real zay, Real rotate_angle, Real scaler){ // TODO - test
+    Vector3 rotate_axis;
+    Set_vector(rotate_axis,rax,ray,zay); // rotate axis
+    return get_rotate_scale_matrix(rotate_axis, rotate_angle, scaler);
+}
+
+Matrix4 get_translation_matrix(Real x, Real y, Real z){
+    Vector3 v; Set_vector(v,x,y,z); // translation vector
+    return Get_translation_matrix(v);
+}
+
+Matrix4 get_translation_matrix(Real x, Real y){
+    Vector3 v; Set_vector(v,x,y,0.0); // translation vector
+    return Get_translation_matrix(v);
+}
+
 void perspective_vector(Vector4 v[], Integer size, Real d){
     Matrix4 m_per = Get_perspective_matrix(d);
     matmul( v,size,m_per);
