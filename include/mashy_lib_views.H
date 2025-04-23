@@ -499,4 +499,49 @@ void view_delete_all(){
 	}
 }
 
+void view_flick(View v){
+	Integer c;
+	View_get_background_colour(v,c);
+	Integer r,g,b;
+	if(c & (1 << 31)) {
+		r = (c & 16711680) >> 16;
+		g = (c &    65280) >> 8;
+		b = (c &      255);
+		// Print("direct colour <"+To_text(c)+","+To_text(r)+","+To_text(g)+","+To_text(b)+","+">\n");
+	}else{
+		Convert_colour(c,r,g,b);
+		// Print("converting colour <"+To_text(c)+">\n");
+	}
+	r=255-r;	g=255-g;	b=255-b;
+	Integer c2 = ( (1 << 31) | (r << 16) | (g << 8) | b) ;
+	
+	View_set_background_colour(v,c2);
+	View_redraw(v);
+	Text t; Get_name(v,t);
+	// Print("Flicking view <"+t+"> to colour <"+To_text(c2)+">\n");
+	View_set_background_colour(v,c);
+	View_redraw(v);
+	// Print("Flicking view <"+t+"> to colour <"+To_text(c)+">\n");
+	
+}
+
+void flick_last_view(){
+	Text t;
+	Get_last_view(t);
+	View v = Get_view(t);
+	view_flick(v);
+}
+
+void flick_all_views(){
+	Dynamic_Text views;
+	Get_project_views(views);
+	Integer items;
+	Get_number_of_items(views,items);
+	for(Integer i=1;i<=1;i++){
+		Text t;
+		Get_item(views,i,t);
+		view_flick(Get_view(t));
+	}
+}
+
 #endif

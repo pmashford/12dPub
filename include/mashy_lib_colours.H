@@ -19,11 +19,21 @@ Text colour_to_hex(Integer c){
 
 
 Integer convert_colour(Text name){
-	Integer value = 1;
+	Integer value;
 	if(Convert_colour(name,value)){
 		value = 1;
 	}
 	return (value);
+}
+
+Integer get_inverse_rgb(Integer c, Integer &r,Integer &g, Integer &b){
+	Integer ierr = Convert_colour(c,r,g,b);
+	r=255-r;	g=255-g;	b=255-b;
+	return ierr;
+}
+
+void get_inverse_rgb(Integer rr, Integer gg, Integer bb, Integer &r,Integer &g, Integer &b){
+	r=255-rr;	g=255-gg;	b=255-bb;
 }
 
 #endif
