@@ -169,7 +169,7 @@ void draw_polygon(Draw_Box &box, Vector4 v[] , Integer start_index, Integer coun
 
 #include "mashy_lib_vectors_matrix.H"
 
-void draw_polygon(Draw_Box &box, Vector4 v[] , Vector4 f[], Vector3 c[], Integer fid){
+void draw_polygon(Draw_Box &box, Vector4 v[] , Vector4 f[], Vector3 c[], Integer fid, Real b_0_1){
 	// Integer count = 0;
 	Real r,g,b,a;
 	
@@ -185,6 +185,11 @@ void draw_polygon(Draw_Box &box, Vector4 v[] , Vector4 f[], Vector3 c[], Integer
 	}
 	Get_vector(v[a],x[4],y[4],z[4],zz);
 	Get_vector(c[fid],r,g,b);
+	// b_0_1 = b_0_1 * b_0_1; // always +ve and scales closer to 0.0 (I think)
+	// r = r + (255 - r - r) * b_0_1; // gets the inverse colour factored by b_0_1
+	// g = g + (255 - g - g) * b_0_1; // gets the inverse colour factored by b_0_1
+	// b = b + (255 - b - b) * b_0_1; // gets the inverse colour factored by b_0_1
+
 	Set_fill_colour(box,r,g,b);
 	Set_colour(box,r,g,b);
 	// Set_colour(box,240,240,240);
@@ -197,6 +202,31 @@ Real normalize_linear(Real number, Real min_val, Real max_val) { //  get a value
 	}
 	return (2. * (number - min_val) / (max_val - min_val) - 1.);
 }
+
+{
+	Real GLOBAL_FPS_LAST_TIME = 0xFFFFFFFF;
+}
+
+Real get_fps(){
+	if(GLOBAL_FPS_LAST_TIME == 0xFFFFFFFF){
+		Get_time(GLOBAL_FPS_LAST_TIME);
+		return 0xFFFFFFFF;
+	}
+	Real fps;
+	Get_time(fps);
+	Real diff = 1.0 / (fps - GLOBAL_FPS_LAST_TIME);
+	GLOBAL_FPS_LAST_TIME = fps;
+	return diff;
+
+}
+
+void draw_box_text_setup(Draw_Box box){
+	Set_text_colour(box,123,123,133);
+	Set_text_font(box,"Arial");
+	// Set_text_weight(box,0);
+	// Set_text_align(box,0);
+}
+
 
 void draw_about_panel_draw_box_logo2(Draw_Box &box, Integer &cursor_x, Integer &cursor_y, Real &spin, Integer use_spin){
 	Integer box_width,box_height;
@@ -266,23 +296,31 @@ void draw_about_panel_draw_box_logo2(Draw_Box &box, Integer &cursor_x, Integer &
 
 	Start_batch_draw(box);
 	Clear(box,240,240,240);
+	// Real fps,t2;
 
-	draw_polygon(box, vertz , facez, cols, 6);
-	draw_polygon(box, vertz , facez, cols, 5);
-	draw_polygon(box, vertz , facez, cols, 4);
-	draw_polygon(box, vertz , facez, cols, 3);
-	draw_polygon(box, vertz , facez, cols, 2);
-	draw_polygon(box, vertz , facez, cols, 1);
+	// nx = Absolute(nx);
+	// ny = Absolute(ny);
+	// nx = (nx > ny) ? nx : ny;
+	// Print("nx = " + To_text(nx,5) + "\n");
+	// Print("ny = " + To_text(ny,5) + "\n\n");
+	draw_polygon(box, vertz , facez, cols, 6,nx);
+	draw_polygon(box, vertz , facez, cols, 5,nx);
+	draw_polygon(box, vertz , facez, cols, 4,nx);
+	draw_polygon(box, vertz , facez, cols, 3,nx);
+	draw_polygon(box, vertz , facez, cols, 2,nx);
+	draw_polygon(box, vertz , facez, cols, 1,nx);
 
-	draw_polygon(box, vertz2 , facez, cols, 6);
-	// draw_polygon(box, vertz2 , facez, cols, 5);
-	// draw_polygon(box, vertz2 , facez, cols, 4);
-	draw_polygon(box, vertz2 , facez, cols, 3);
-	draw_polygon(box, vertz2 , facez, cols, 2);
-	// draw_polygon(box, vertz2 , facez, cols, 1);
-
+	draw_polygon(box, vertz2 , facez, cols, 6,nx);
+	// draw_polygon(box, vertz2 , facez, cols, 5,nx);
+	// draw_polygon(box, vertz2 , facez, cols, 4,nx);
+	draw_polygon(box, vertz2 , facez, cols, 3,nx);
+	draw_polygon(box, vertz2 , facez, cols, 2,nx);
+	// draw_polygon(box, vertz2 , facez, cols, 1,nx);
+	// Print("FPS = " + To_text(get_fps(),5) + "\n");
+	// Draw_text(box, 5.0, 15.0,10.0,0.0,"FPS = " + To_text(get_fps(),5) );
 
 	End_batch_draw(box);
+	
 
 }
 
@@ -291,7 +329,8 @@ void draw_about_panel_draw_box_logo2(Draw_Box &box){
 	Get_size(box,box_width,box_height);
 	Integer cursor_x = box_width / 2;
 	Integer cursor_y = box_height / 2;
-	draw_about_panel_draw_box_logo2(box, cursor_x, cursor_y,0.0,0);
+	Real spin = 0.0;
+	draw_about_panel_draw_box_logo2(box, cursor_x, cursor_y,spin,0);
 }
 
 
@@ -419,11 +458,12 @@ Integer manage_about_panel(Text text_box_data){
 	Append(vg_all,panel);
 
 	Show_widget(panel);
+	draw_box_text_setup(draw_box);
 	draw_about_panel_draw_box_logo2(draw_box);
 
 	Select_Box select_box = Create_select_box("Title","",SELECT_STRING,message_box);
-	Real cursor[2],spin;
-	cursor[1] = 0.0; cursor[2] = 0.0; spin = 0.0;
+	Real cursor1,cursor2,spin;
+	cursor1 = 0.0; cursor2 = 0.0; spin = 0.0;
 
 	while(1){
 		Integer id;
@@ -434,16 +474,16 @@ Integer manage_about_panel(Text text_box_data){
 			Dynamic_Text parts;
 			From_text(msg,parts);
 			Text t;
-			Get_item(parts,1,t);	From_text(t,cursor[1]);
-			Get_item(parts,2,t);	From_text(t,cursor[2]);
-			draw_about_panel_draw_box_logo2(draw_box,cursor[1],cursor[2],spin,0);
+			Get_item(parts,1,t);	From_text(t,cursor1);
+			Get_item(parts,2,t);	From_text(t,cursor2);
+			draw_about_panel_draw_box_logo2(draw_box,cursor1,cursor2,spin,0);
 		}
 		if(cmd == "mouse_leave" || cmd =="accept select" || cmd == "cancel select"){
 			Select_start(select_box);
 		}
 		if(cmd == "motion select"){
 			spin+=0.175;
-			draw_about_panel_draw_box_logo2(draw_box,cursor[1],cursor[2],spin,1);
+			draw_about_panel_draw_box_logo2(draw_box,cursor1,cursor2,spin,1);
 		}
 
 		if(cmd == "keystroke") continue;

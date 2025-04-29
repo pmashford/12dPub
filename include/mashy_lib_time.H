@@ -52,7 +52,7 @@ Text local_time()
   Text day,month,year,time;
   Dynamic_Text DT;
 
-  Time(time);
+  Get_time(time);
 
   From_text(time,DT);
   Get_item(DT,2,month);
@@ -85,7 +85,7 @@ Text utc_time()
   Text retval;
   Integer dd;
 
-  Time(dd);
+  Get_time(dd);
   retval = To_text(dd);
 
   return retval;
@@ -93,7 +93,7 @@ Text utc_time()
 
 Text get_timestamp(){
 
-   Integer time;   Time(time);
+   Integer time;   Get_time(time);
    //time -= (10*60*60);
    Text format = "%d-%m-%Y %H:%M:%S";
    Text time_text;   Convert_time(time,format,time_text);
@@ -104,7 +104,7 @@ Text get_timestamp(){
 }
 
 Text get_timestamp_for_element_name(){
-   Integer time;   Time(time);
+   Integer time;   Get_time(time);
    //time -= (10*60*60);
    Text format = "%y-%m-%d %H-%M-%S";
    Text time_text;   Convert_time(time,format,time_text);
@@ -113,7 +113,7 @@ Text get_timestamp_for_element_name(){
 
 Text get_timestamp_adjust(Integer hours){
    //will adjust time by hours
-   Integer time;   Time(time);
+   Integer time;   Get_time(time);
    time += (hours*60*60);
    Text format = "%d-%m-%Y %H:%M:%S";
    Text time_text;   Convert_time(time,format,time_text);

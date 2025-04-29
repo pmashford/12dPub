@@ -41,7 +41,7 @@ Integer add_project_diary_day_entry(XML_Node parent_node, Text entry, Text times
 
 Text get_timestamp(){
 
-	Integer time;	Time(time);
+	Integer time;	Get_time(time);
 	time -= (10*60*60);
 	Text format = "%d-%m-%Y %H:%M:%S";
 	Text time_text;	Convert_time(time,format,time_text);

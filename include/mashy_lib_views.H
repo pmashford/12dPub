@@ -507,22 +507,16 @@ void view_flick(View v){
 		r = (c & 16711680) >> 16;
 		g = (c &    65280) >> 8;
 		b = (c &      255);
-		// Print("direct colour <"+To_text(c)+","+To_text(r)+","+To_text(g)+","+To_text(b)+","+">\n");
 	}else{
 		Convert_colour(c,r,g,b);
-		// Print("converting colour <"+To_text(c)+">\n");
 	}
-	r=255-r;	g=255-g;	b=255-b;
-	Integer c2 = ( (1 << 31) | (r << 16) | (g << 8) | b) ;
-	
+	r=255-r;	g=255-g;	b=255-b; // inverse the colour
+	Integer c2 = ( (1 << 31) | (r << 16) | (g << 8) | b) ; // rebuild the inversed colour
+
 	View_set_background_colour(v,c2);
 	View_redraw(v);
-	Text t; Get_name(v,t);
-	// Print("Flicking view <"+t+"> to colour <"+To_text(c2)+">\n");
 	View_set_background_colour(v,c);
 	View_redraw(v);
-	// Print("Flicking view <"+t+"> to colour <"+To_text(c)+">\n");
-	
 }
 
 void flick_last_view(){

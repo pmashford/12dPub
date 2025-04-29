@@ -34,7 +34,7 @@
 
 Integer progress_bar_test_time_interval(){
 	Real this_time;
-	Time(this_time);
+	Get_time(this_time);
 	if( (this_time - progress_bar_time_for_last_tick)>progress_bar_time_interval ){
 		progress_bar_time_for_last_tick = this_time;
 		progress_bar_timer = this_time - progress_bar_start_time;
@@ -51,7 +51,7 @@ void show_progress_bar(Integer max_count, Message_Box &message_box){ // this can
 	progress_bar_message = message_box;
 	Set_data(progress_bar_message,"0.0% complete");
 	progress_bar_timer = 0.0;
-	Time(progress_bar_start_time);
+	Get_time(progress_bar_start_time);
 	//progress_bar_spinner = "\\|/-";
 	progress_bar_spinner = MASHY_LIB_PROGRESS_PANEL_SPINNER_TEXT ;
 	progress_bar_spinner_char = 1;

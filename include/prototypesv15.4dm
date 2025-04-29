@@ -1324,14 +1324,18 @@ Integer Set_scale(Draw_Box box,Real xs,Real ys); // ID = 1341
 Integer Set_colour(Draw_Box box,Integer colour); // ID = 1342
 Integer Set_colour(Draw_Box box,Integer r,Integer g,Integer b); // ID = 1343
 Integer Clear(Draw_Box box,Integer r,Integer g,Integer b); // ID = 1344
+
 Integer Draw_text(Draw_Box box,Real x,Real y,Real ht,Real angle,Text text); // ID = 1345
+
 Integer Set_text_colour(Draw_Box box,Integer r,Integer g,Integer b); // ID = 1346
 Integer Set_bk_colour(Draw_Box box,Integer r,Integer g,Integer b); // ID = 1347
 Integer Set_bk_mode(Draw_Box box,Integer mode); // ID = 1348
 Integer Set_text_font(Draw_Box box,Text font); // ID = 1349
 Integer Set_text_weight(Draw_Box box,Integer weight); // ID = 1350
 Integer Set_text_align(Draw_Box box,Integer mode); // ID = 1351
+
 Integer Get_size(Draw_Box,Integer &x,Integer &y); // ID = 1352
+
 Integer Draw_polygon(Draw_Box box,Integer n,Real x[],Real y[]); // ID = 1353
 Integer Set_fill_colour(Draw_Box box,Integer r,Integer g,Integer b); // ID = 1354
 Integer Draw_polyline(Draw_Box box,Integer n,Real x[],Real y[]); // ID = 1355

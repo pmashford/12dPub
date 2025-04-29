@@ -74,7 +74,7 @@ Text get_temporary_file(Text file_name){
 
 Text get_time_for_filename(){
 	//Real time;		Time(time);
-	Integer itime;		Time(itime);
+	Integer itime;		Get_time(itime);
 	Text t;
 	Convert_time    (itime,"%Y%m%d-%Hh%Mm(%Ss)",t);
 	return (t);
