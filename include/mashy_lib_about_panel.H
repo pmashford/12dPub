@@ -462,8 +462,9 @@ Integer manage_about_panel(Text text_box_data){
 	draw_about_panel_draw_box_logo2(draw_box);
 
 	Select_Box select_box = Create_select_box("Title","",SELECT_STRING,message_box);
-	Real cursor1,cursor2,spin;
-	cursor1 = 0.0; cursor2 = 0.0; spin = 0.0;
+	Integer cursor1 = 0,cursor2 = 0;
+	Real spin=0.;
+	// cursor1 = 0.0; cursor2 = 0.0; spin = 0.0;
 
 	while(1){
 		Integer id;
