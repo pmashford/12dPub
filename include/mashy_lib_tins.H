@@ -14,6 +14,20 @@
 #include "mashy_lib_element_functions.H"
 
 
+Tin create_tin(Text tin_name, Dynamic_Element elts_for_tin, Real null_length){
+    Tin tin;
+    if(Tin_exists(tin_name) ){ // stage old tin to swap in new tin preserving IDs
+        Tin_delete(Get_tin(tin_name));
+    }
+    //Create a 'quick tin' using elts_for_tin
+    Integer colour = 1;
+    Integer preserve = 1; //breaklines
+    Integer bubbles = 0;
+    Triangulate(elts_for_tin,tin_name,colour,preserve,bubbles,tin);
+    Null_by_angle_length(tin, null_length, 0. , null_length, 0. );
+    return tin;
+}
+
 Text get_tin_prefix_env(){
 	Text t = Text_justify(Getenv("MODEL_FOR_TIN_PREFIX_4D"));
 	if(t == "")t="tin *";

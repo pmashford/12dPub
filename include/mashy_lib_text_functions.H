@@ -1015,7 +1015,6 @@ Text find_replace_spaces(Text text){
 }
 
 
-
 Text quotes_strip(Text txt){
 // remove and leading and trailing "quotes" or 'quotes' - return the resulting string
 	Integer len;
