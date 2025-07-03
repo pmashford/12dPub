@@ -14,6 +14,16 @@
 #include "mashy_lib_element_functions.H"
 
 
+
+//TODO recalc
+Integer tin_recalc(Tin tin){
+	return Retriangulate(tin); // ID = 1429
+}
+
+Integer tin_recalc(Text tin_name){
+	return Retriangulate(Get_tin(tin_name)); // ID = 1429
+}
+
 Tin create_tin(Text tin_name, Dynamic_Element elts_for_tin, Real null_length){
     Tin tin;
     if(Tin_exists(tin_name) ){ // stage old tin to swap in new tin preserving IDs
