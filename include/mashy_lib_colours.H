@@ -92,4 +92,14 @@ Integer get_adjusted_contrast(Integer colour, Real factor) {
     return (r << 16) | (g << 8) | b | (1 << 31);	
 }
 
+void lerp_color(Integer r1, Integer g1, Integer b1, Integer r2, Integer g2, Integer b2, Real factor, Integer &r, Integer &g, Integer &b) {
+    // clamp factor between 0.0 and 1.0
+    if (factor < 0. ) factor = 0. ;
+    if (factor > 1. ) factor = 1. ;
+    r = (r1 * (1. - factor) + r2 * factor);
+    g = (g1 * (1. - factor) + g2 * factor);
+    b = (b1 * (1. - factor) + b2 * factor);
+}
+
+
 #endif
