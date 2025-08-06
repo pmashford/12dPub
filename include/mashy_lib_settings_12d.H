@@ -55,11 +55,28 @@ void main(){	Clear_console();	return test_settings_12d_values();  }
 #endif
 
 
+
+
+Integer settings_function_results_off(){ // returns old settng so that it can be restored
+    Integer old_value = Get_project_setting_integer("default/show_function_results");
+    if(old_value == 0) return 0; // already off
+    Set_project_setting_integer("default/show_function_results", 0);
+    return 1;
+} 
+
+void settings_function_results_restore(Integer old_value){
+    Set_project_setting_integer("default/show_function_results", old_value);
+}
+
+
 Integer settings_set(Text key, Integer new_value, Integer &old_value){
 	if(!Project_setting_exists("default/"+key))return 999;
     old_value = Get_project_setting_integer("default/"+key);
 	return Set_project_setting_integer("default/"+key, new_value);
 }
+
+
+
 
 Integer settings_set(Text key, Integer new_value){
 	return Set_project_setting_integer("default/"+key, new_value);
