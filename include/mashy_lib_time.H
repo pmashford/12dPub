@@ -2,6 +2,26 @@
 #define mashy_lib_time_h_included
 
 
+//Tue Sep 16, 2025 10:05 am
+#define MY_TIME_FORMAT "%a %b %d, %Y %I:%M %p"
+
+Time get_now(){
+    Time t;
+    Get_time(t);
+    return t;
+}
+
+Text get_time(Time &t, Text format){
+    //see https://pubs.opengroup.org/onlinepubs/009696799/functions/strftime.html for format options
+    Text result;
+    if(Convert_time(t, format, result)){
+        return "Error converting time (using format: " + format + ")";
+    }
+    return result;
+}
+
+
+
 Integer is_leap_year(Integer YYYY){ // tested
   if( ( (YYYY % 4 == 0) && (YYYY % 100 != 0) ) || (YYYY % 400 == 0) ){
     return 1;
