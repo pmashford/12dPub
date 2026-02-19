@@ -58,6 +58,27 @@ Dynamic_Text get_all_view_type_Section(){
 	return(dt);
 }
 
+void section_view_regenerate(Element &e, Integer do_view_fit){ // regen any section view if it is profilling e
+	Uid id;
+	Get_id(e,id);
+	Dynamic_Text all_views;
+	Get_project_views(all_views);
+	Integer n_items;
+	Get_number_of_items(all_views,n_items);
+	for (Integer i=1;i<=n_items;i++){
+		Text this_view;
+		Get_item(all_views,i,this_view);
+		Element section_e;
+		if(!Get_section_profile_string(Get_view(this_view),section_e)){ // this should skip views not of type "Section"
+			Uid id2;
+			Get_id(section_e,id2);
+			if (id == id2) {
+				Section_view_regenerate(Get_view(this_view),do_view_fit);
+			}
+		}
+	}
+}
+
 
 void model_to_back_all_views(Text name_to_back){
 	Model model_to_back = Get_model(name_to_back);
