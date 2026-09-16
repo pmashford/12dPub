@@ -393,6 +393,11 @@ void test_bitwise_unary_complement(Integer64 a){
 	test_bitwise_output(a, c);
 }
 
+Integer64 manual_mod(Integer64 &dividend, Integer64 &divisor){
+	Integer64 result = dividend / divisor; // result truncates to integer64
+	return dividend - (result * divisor);
+}
+
 void test_bitwise(){
 	Print("\n[test_bitwise &]"+"\n");
 	test_bitwise_and(LARGE_POSITIVE,55);

@@ -154,37 +154,7 @@ Integer is_e_closed(Element &e){
 	String_closed(e,is_closed);
 	return is_closed;
 }
-Integer is_inside(Real x, Real y, Element &element){
-	Integer is_closed;
-	String_closed(element,is_closed);
-	if(!is_closed)return 0;
 
-	Real xmin,xmax,ymin,ymax;
-	Get_extent_x  ( element,xmin,xmax);
-	Get_extent_y  ( element,ymin,ymax);
-	if(x < xmin || x > xmax)return 0;
-	if(y < ymin || y > ymax)return 0;
-
-	Line seg_2;
-	Point p1,p2;
-	Set_x(p1,x);	Set_y(p1,y);
-	Set_x(p2,xmax+1);	Set_y(p2,y);
-	Set_start(seg_2,p1);	Set_end(seg_2,p2);
-
-	Integer nsegs;
-	Get_segments(element,nsegs);
-	Integer count = 0;
-	for(Integer i = 1;i<=nsegs;i++){
-		Segment seg_1;
-		Get_segment(element,i,seg_1);
-		Integer no_intersects = 0;
-		if(!Intersect       ( seg_1, seg_2,no_intersects,p1,p2)){
-			count +=no_intersects;
-		}
-	}
-	if(count % 2)return 1;// if there is a remainder then the count is odd
-	return 0;
-}
 
 Integer set_function_id(Dynamic_Element &delt, Macro_Function &macro_function){
 	Integer items;	Get_number_of_items(delt,items);
@@ -1518,6 +1488,88 @@ Integer get_previous(Uid uid_m, Uid uid_e, Element &previous_e){
 		}
 	}
 	return 1;
+}
+
+
+Integer is_inside(Real x, Real y, Element &element){
+	Integer is_closed;
+	String_closed(element,is_closed);
+	if(!is_closed)return 0;
+
+	Real xmin,xmax,ymin,ymax;
+	Get_extent_x  ( element,xmin,xmax);
+	Get_extent_y  ( element,ymin,ymax);
+	if(x < xmin || x > xmax)return 0;
+	if(y < ymin || y > ymax)return 0;
+
+	Line seg_2;
+	Point p1,p2;
+	Set_x(p1,x);	Set_y(p1,y);
+	Set_x(p2,xmax+1);	Set_y(p2,y);
+	Set_start(seg_2,p1);	Set_end(seg_2,p2);
+
+	Integer nsegs;
+	Get_segments(element,nsegs);
+	Integer count = 0;
+	for(Integer i = 1;i<=nsegs;i++){
+		Segment seg_1;
+		Get_segment(element,i,seg_1);
+		Integer no_intersects = 0;
+		if(!Intersect       ( seg_1, seg_2,no_intersects,p1,p2)){
+			count +=no_intersects;
+		}
+	}
+	if(count % 2)return 1;// if there is a remainder then the count is odd
+	return 0;
+}
+
+// this will do a batch of points
+void is_inside_batch(Real x_list[], Real y_list[], Integer &xy_is_inside[], Integer n_points, Element &element) {
+    Integer is_closed;
+    String_closed(element, is_closed);
+    // TODO: could assume the element is closed, or add a flag to the function to enable this sort of mode
+	if (!is_closed) {
+        for (Integer i = 1; i <= n_points; i++) xy_is_inside[i] = 0;
+        return;
+    }
+
+    Real xmin, xmax, ymin, ymax;
+    Get_extent_x(element, xmin, xmax);
+    Get_extent_y(element, ymin, ymax);
+
+    // get element data once
+    Integer nsegs;
+    Get_segments(element, nsegs);
+	Integer npts = nsegs + 1;
+	Real x[npts], y[npts], z[npts];
+	get_data(element, x, y, z, npts,npts);
+    
+
+    for (Integer a=1; a <= n_points; a++) {
+        Real xp = x_list[a]; //this point x
+        Real yp = y_list[a]; //this point y
+
+        if (xp < xmin || xp > xmax || yp < ymin || yp > ymax) { // is p in bounds?
+            xy_is_inside[a] = 0;
+            continue;
+        }
+
+        Integer count = 0;
+        for (Integer i = 1; i <= nsegs; i++) {
+            Real y1 = y[i];
+            Real y2 = y[i+1];
+
+            if ((y1 > yp) != (y2 > yp)) {
+                Real x1 = x[i];
+                Real x2 = x[i+1];
+                if (xp < x1 + (yp - y1) * (x2 - x1) / (y2 - y1)) {
+                    count++;
+                }
+            }
+        }
+        xy_is_inside[a] = count % 2;
+    }
+
 }
 
 #endif

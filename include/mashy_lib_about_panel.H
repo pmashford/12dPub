@@ -3,6 +3,7 @@
 
 #include "mashy_lib_element_functions.h"
 #include "mashy_lib_files.H"
+#include "mashy_lib_text_functions.H"
 
 //THIS SHOULD BE AT THE START OF EVERY MACRO
 #ifndef ABOUT_PANEL_DATA_INCLUDED
@@ -365,6 +366,7 @@ Text get_about_panel_12d_info(){
 
 	t+="\n";
 	t+="Macro path: "+Get_macro_name()+"\n";
+	t+="Macro path: " + replace_env_path(Get_macro_name()) + "\n";
 	t+="User: "+user_name+"\n";
 	t+="Project Name: "+project_name+"\n";
 	t+="Project Path: "+project_path+"\n";
@@ -378,6 +380,7 @@ Integer manage_about_panel(Text text_box_data){
 	Panel panel = Create_panel(about_macro_for + " | About Macro");
 	Message_Box message_box = Create_message_box("");
 	Vertical_Group vg_all = Create_vertical_group(0);
+	Button button_find_me = Create_button("Open Macro Location","open macro");
 
 	Vertical_Group vg = Create_vertical_group(0);
 	Horizontal_Group hg_buttons = Create_button_group();
@@ -436,6 +439,7 @@ Integer manage_about_panel(Text text_box_data){
 
 
 	Append(draw_box,vg);
+	Append(button_find_me,vg);
 	Append(tab_box,vg);
 
 	Text email_new_line = "%0A";
@@ -452,6 +456,7 @@ Integer manage_about_panel(Text text_box_data){
 	Append(vg,vg_all);
 
 	//Append(message_box,vg_all);
+	
 
 	Append(hg_buttons,vg_all);
 
@@ -485,6 +490,12 @@ Integer manage_about_panel(Text text_box_data){
 		if(cmd == "motion select"){
 			spin+=0.175;
 			draw_about_panel_draw_box_logo2(draw_box,cursor1,cursor2,spin,1);
+		}
+		if(id == Get_id(button_find_me)){
+			Text macro_path = replace_env_path(Get_macro_name());
+			run_system_command_no_wait("explorer.exe /select,\""+macro_path+"\"");
+		
+			
 		}
 
 		if(cmd == "keystroke") continue;

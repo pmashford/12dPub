@@ -1229,6 +1229,12 @@ Integer replace_env_path(Text source, Text &output){
 	return(-1);
 }
 
+Text replace_env_path(Text source){
+	Text output;
+	replace_env_path(source,output);
+	return output;
+}
+
 //--------------------------------------------------------------------------------
 //                        PROCESS TEXT STRINGS WITH NEW LINES AND DELIMIERS
 //--------------------------------------------------------------------------------

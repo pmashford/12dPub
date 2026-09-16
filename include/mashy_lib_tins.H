@@ -104,7 +104,7 @@ Integer is_shared_in(Tin &tin){
 	return ierr;
 }
 
-Integer get_project_tin_models(Dynamic_Text &tin_names, Dynamic_Text &model_names){
+Integer get_project_tin_models(Dynamic_Text &projects_tin_names, Dynamic_Text &projects_tin_model_names){
 //made some changes but never checked
 	Integer count;
 	Dynamic_Text project_models;
@@ -115,7 +115,7 @@ Integer get_project_tin_models(Dynamic_Text &tin_names, Dynamic_Text &model_name
 		//p("Checking model <"+model_name+"> for tins");
 		Model model = Get_model(model_name);
 		Dynamic_Element elts;
-		Append(model,elts);		// <=made some changes but never checked... no QA done
+		Append(model,elts);		// TODO: <=made some changes but never checked... no QA done
 		Integer num_elts;
 		Get_number_of_items(elts,num_elts);
 		for(Integer j = 1 ; j <= num_elts ; j++){
@@ -123,8 +123,8 @@ Integer get_project_tin_models(Dynamic_Text &tin_names, Dynamic_Text &model_name
 			Text type;	Get_type(elt,type);
 			if(type == "Tin"){
 				Text tin_name;	Get_name(elt,tin_name);
-				Append(tin_name,tin_names);
-				Append(model_name,model_names);
+				Append(tin_name,projects_tin_names);
+				Append(model_name,projects_tin_model_names);
 				count++;
 			}
 			Null(elt);
@@ -138,21 +138,21 @@ Integer get_project_tin_models(Dynamic_Text &tin_names, Dynamic_Text &model_name
 #define TIN_NOT_IN_ANY_MODELS 10
 
 // this should be used when info is required for multiple tins - the database is only checked once for all tins - this process is SLOW
-Integer get_tin_models(Text tin_name, Dynamic_Text &tin_list, Dynamic_Text &tin_model_list, Dynamic_Text &matched_model_list){
+Integer get_tin_models(Text tin_name_to_find, Dynamic_Text &projects_tin_names, Dynamic_Text &projects_tin_model_names, Dynamic_Text &matched_model_list){
 	// return none 0 if the tin tin_name does not exist
 	Null(matched_model_list);
 	Integer items;
-	Get_number_of_items(tin_list,items);
+	Get_number_of_items(projects_tin_names,items);
 	Integer count=0;
 	for(Integer i=1;i<=items;i++){
 		Text t;
-		Get_item(tin_list,i,t);
-		if(t == tin_name){
+		Get_item(projects_tin_names,i,t);
+		if(t == tin_name_to_find){
 			Append(t,matched_model_list);
 			count++;
 		}
 	}
-	if(count)return 0;	// if there were models found then
+	if(count)return 0;	// if there were models found
 	return TIN_NOT_IN_ANY_MODELS;
 }
 
