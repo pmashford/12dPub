@@ -1,6 +1,5 @@
 {
     //Base VS Code-specific settings
-    "terminal.integrated.defaultProfile.windows": "Command Prompt", //Uses command prompt as the terminal instead of the default PowerShell
     "editor.suggest.localityBonus": true, // Controls whether sorting favours words that appear close to the cursor
     "editor.wordBasedSuggestions": "matchingDocuments", // Enable word based suggestions
     "editor.mouseWheelZoom": true, //Enable zooming with Ctrl+Scroll wheel
@@ -13,9 +12,7 @@
     "files.associations": {
         "*.4dm": "cpp",
         "*.h": "cpp",
-        "*.rh": "cpp",
-        "*.4d": "cpp",
-        "xutility": "cpp"
+        "*.4d": "cpp"
     },
 
     //Extension-specific settings
