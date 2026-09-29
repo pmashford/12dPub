@@ -19,6 +19,5 @@
     },
 
     //Extension-specific settings
-    "C_Cpp.intelliSenseEngine": "Tag Parser", //Needed so that Intellisense works
-    "AllAutocomplete.showOpenDocuments": false //Restricts 'AllAutocomplete' extension to only show autocomplete entries from the current document
-} 
+    "C_Cpp.intelliSenseEngine": "Tag Parser" //Needed so that Intellisense works
+}

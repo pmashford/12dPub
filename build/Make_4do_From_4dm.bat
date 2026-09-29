@@ -3,7 +3,6 @@ setlocal enabledelayedexpansion
 
 if "%~1"=="" (
     echo Error: No argument provided.
-    echo Error: No argument provided. > X:\12d\Temp\temp.4dl
     exit /b 1
 )
 
@@ -24,6 +23,9 @@ for %%I in ("!fullpath!") do (
 
 set "repoBin=!repohome!\bin"
 
+rem put this repo's \include\ first on the cc4d include path, keeping any user CPATH (unix-style ':' separator, not ';')
+if defined CPATH (set "CPATH=!repohome!\include:!CPATH!") else (set "CPATH=!repohome!\include")
+
 echo fullpath : %fullpath%
 echo filePath : %filePath%
 echo fileBase : %fileBase%
@@ -31,16 +33,21 @@ echo fileBaseExt : %fileBaseExt%
 echo fileTarget : %fileTarget%
 echo repoBin : %repoBin%
 echo filePathRelative : %filePathRelative%
+echo CPATH : %CPATH%
 
-if exist "C:\Program Files\12d\12dmodel\15.00\nt.x64\12d.exe" set where=C:\Program Files\12d\12dmodel\15.00\nt.x64
+set "where=C:\Program Files\12d\12dmodel\15.00\nt.x64"
+if not exist "%where%\cc4d.exe" (
+    echo Error: cc4d.exe not found in "%where%"
+    exit /b 1
+)
 
-echo compiling %fullpath% using %where% 
+echo compiling %fullpath% using %where%
 
 REM START code to get QUOTED_CC4D_VERSION_DATA (send errors to file to capture the version data for cc4d.exe)
-set ERRORFILE=C:\TEMP\temp_cmd_redirect_errors.txt
-"%where%\cc4d.exe" 2> %ERRORFILE%
+set "ERRORFILE=%TEMP%\cc4d_version_%RANDOM%.txt"
+"%where%\cc4d.exe" 2> "%ERRORFILE%"
 set "QUOTED_CC4D_VERSION_DATA="
-for /f "delims=" %%a in ('type %ERRORFILE% ^| findstr "^Version"') do (
+for /f "delims=" %%a in ('type "%ERRORFILE%" ^| findstr "^Version"') do (
     set "QUOTED_CC4D_VERSION_DATA=%%a"
 )
 
@@ -57,26 +64,49 @@ echo where MACRO_VERSION_4D = "%MACRO_VERSION_4D%"
 echo where MACRO_LAST_OPCODE_4D = "%MACRO_LAST_OPCODE_4D%"
 echo where MACRO_LAST_LIBRARY_CODE_4D = "%MACRO_LAST_LIBRARY_CODE_4D%"
 echo:
-del %ERRORFILE%
-REM END code to get QUOTED_CC4D_VERSION_DATA 
+del "%ERRORFILE%"
+REM END code to get QUOTED_CC4D_VERSION_DATA
 
 cd /d "%filePath%"
 
+rem compiler errors go to NAME.4dl next to the source (typed below so vscode's problem matcher still sees them)
+set "logfile=%filePath%%fileBase%.4dl"
+if exist "%logfile%" del "%logfile%"
+
 rem pass in macros with -D
-set mycmd="%where%\cc4d.exe" "%fullpath%" -allow_old_calls -D"QUOTED_CC4D_VERSION_DATA=\"\\\"%QUOTED_CC4D_VERSION_DATA%\\\"\"" -DMACRO_VERSION_4D=%MACRO_VERSION_4D% -DMACRO_LAST_OPCODE_4D=%MACRO_LAST_OPCODE_4D% -DMACRO_LAST_LIBRARY_CODE_4D=%MACRO_LAST_LIBRARY_CODE_4D%
+set mycmd="%where%\cc4d.exe" "%fullpath%" -allow_old_calls -log "%logfile%" -D"QUOTED_CC4D_VERSION_DATA=\"\\\"%QUOTED_CC4D_VERSION_DATA%\\\"\"" -DMACRO_VERSION_4D=%MACRO_VERSION_4D% -DMACRO_LAST_OPCODE_4D=%MACRO_LAST_OPCODE_4D% -DMACRO_LAST_LIBRARY_CODE_4D=%MACRO_LAST_LIBRARY_CODE_4D%
 %mycmd%
+set "ccexit=%errorlevel%"
 echo %mycmd%
 
+ECHO "========================================================="
+ECHO " COMPILER RESULTS
+ECHO "========================================================="
+if exist "%logfile%" type "%logfile%"
+ECHO "========================================================="
+
+rem cc4d deletes the old .4do on a failed compile, so dont touch /bin/ (leaves the last good build there)
+if not "%ccexit%"=="0" (
+    echo COMPILE FAILED ^(cc4d exit code %ccexit%^) - bin not updated
+    endlocal
+    exit /b 1
+)
+
+echo COMPILE OK : %filePath%%fileBase%.4do (%date% %time: =%)
+
 rem SKIP ALL THIS IF THE MACRO FILENAME CONTAINS test, WE DONT WANT TO COPY THESE TO /bin/
-if not x%fileBase:test=%==x%fileBase% goto end
-if not x%fileBase:mashy_lib=%==x%fileBase% goto end
+set "skipreason="
+if not x%fileBase:test=%==x%fileBase% set "skipreason=test"
+if not x%fileBase:mashy_lib=%==x%fileBase% set "skipreason=mashy_lib"
+if defined skipreason (
+    echo SKIPPED    : bin not updated ^(filename contains "%skipreason%"^)
+    goto end
+)
 
-echo. 
-echo updating macros 
-echo. 
-
-copy "%filePath%\%fileBase%.4do" "%repoBin%"
-copy "%filePath%\%fileBase%.4do" "%repoBin%\_macro_hot_off_the_press.4do"
+copy /y "%filePath%\%fileBase%.4do" "%repoBin%" >nul || (echo COPY FAILED : %repoBin%\%fileBase%.4do & endlocal & exit /b 1)
+echo COPIED     : %repoBin%\%fileBase%.4do
+copy /y "%filePath%\%fileBase%.4do" "%repoBin%\_macro_hot_off_the_press.4do" >nul || (echo COPY FAILED : %repoBin%\_macro_hot_off_the_press.4do & endlocal & exit /b 1)
+echo COPIED     : %repoBin%\_macro_hot_off_the_press.4do
 
 set "infofile=%repoBin%\%fileBase%.json"
 echo { > "%infofile%"
@@ -88,14 +118,10 @@ echo "sourceDirname": "%filePathRelative:\=/%", >> "%infofile%"
 echo "compiler": "%where:\=/%/cc4d.exe", >> "%infofile%"
 echo "compilerInfo": "%QUOTED_CC4D_VERSION_DATA:\=/%" >> "%infofile%"
 echo } >> "%infofile%"
+echo WROTE      : %infofile%
 
 :end
-
-ECHO "=========================================================" 
-ECHO " COMPILER RESULTS 
-ECHO "========================================================="
-type "X:\12d\Temp\temp.4dl"
-ECHO "=========================================================" 
+echo DONE
 @ECHO ON
 
-endlocal 
+@endlocal

@@ -1,125 +1,94 @@
 {
-    // See https://go.microsoft.com/fwlink/?LinkId=733558
-    // for the documentation about the tasks.json format
-    "version":"2.0.0", 
-    "owner": "cpp",
-    "tasks":[
+    // 12d Model macro tasks.
+    // All compiling goes through build\Make_4do_From_4dm*.bat, which is the reference build. It puts the repo's
+    // include folder on CPATH, passes the cc4d version -D defines, writes NAME.4dl next to the source, and only
+    // updates bin\ when the compile succeeds. Ctrl+Shift+B compiles the file with focus using v15.
+    "version": "2.0.0",
+    "tasks": [
         {
-            "label": "Compile 4dm to 4do custom batch file (12d model macro)",
+            "label": "12dPL: Compile macro (v15)",
             "type": "process",
-            "options": {
-                "cwd": "${fileDirname}"
-            },
             "command": "${workspaceFolder}/build/Make_4do_From_4dm.bat",
-            "args": [
-                "${file}"
-            ],
-            "problemMatcher": {
-                "base": "$gcc",
-                "fileLocation": "autoDetect",
-                "severity": "error",
-                "pattern": {
-                    "regexp": "^\"(.*?)\",(.*?)line (.*?)\\.(.*?)\\: (.*?)\\: (.*)",
-                    "file": 1,
-                    "line": 3,
-                    "column": 4,
-                    "code": 5,
-                    "message": 6
+            "args": ["${file}"],
+            "options": { "cwd": "${fileDirname}" },
+            "group": { "kind": "build", "isDefault": true },
+            "problemMatcher": [
+                {
+                    // "C:\...\NAME.4dm", line 3.56: error: nope not defined on line 3.51
+                    "owner": "12d",
+                    "source": "cc4d",
+                    "fileLocation": ["autoDetect", "${fileDirname}"],
+                    "pattern": {
+                        "regexp": "^\"(.+)\", line (\\d+)\\.(\\d+): (error|warning): (.*)$",
+                        "file": 1, "line": 2, "column": 3, "severity": 4, "message": 5
+                    }
+                },
+                {
+                    // C:\...\NAME.4dm:2: missing.H: file not found  (cc4d does not count this as an error)
+                    "owner": "12d",
+                    "source": "cc4d",
+                    "severity": "warning",
+                    "fileLocation": ["autoDetect", "${fileDirname}"],
+                    "pattern": {
+                        "regexp": "^(.+?):(\\d+): (.+): file not found$",
+                        "file": 1, "line": 2, "message": 3
+                    }
                 }
-            },
+            ],
             "presentation": {
                 "echo": false,
-                "reveal": "never",
+                "reveal": "always",
+                "revealProblems": "onProblem",
                 "panel": "dedicated",
-                "focus": true,
+                "focus": false,
                 "clear": true
             }
         },
         {
-            "label": "Build",
-            "dependsOrder": "sequence",
-            "dependsOn": [
-                "Compile 4dm to 4do custom batch file (12d model macro)"
-            ],
-            "group": {
-                "kind": "build",
-                "isDefault": true
-            },
-            "problemMatcher": [
-                "$gcc"
-            ]
-        },
-        {
-            "label": "Create a new prototypes file (12d model macro)",
-            "type": "shell",
-            "options": {
-                "cwd": "${fileDirname}"
-            },
-            "command": "C:/Program Files/12d/12dmodel/15.00/nt.x64/cc4d.exe",
-            "args": [
-                "-list",
-                "${workspaceFolder}/include/prototypesv15.4dm"
-            ],
-            "problemMatcher": []
-        },
-        {
-            "label": "Create 4dm prototypes",
-            "dependsOrder": "sequence",
-            "dependsOn": [
-                "Create a new prototypes file (12d model macro)"
-            ],
-            "group": {
-                "kind": "none",
-                "isDefault": false
-            },
-            "problemMatcher": [
-                "$gcc"
-            ]
-        },
-        {
-            "label": "V14 - Compile 4dm to 4do custom batch file (12d model macro)",
+            "label": "12dPL: Compile macro (v14)",
             "type": "process",
-            "options": {
-                "cwd": "${fileDirname}"
-            },
-            "command": "${workspaceFolder}/build/Make_4do_From_4dm_V14.bat",
-            "args": [
-                "${file}"
-            ],
-            "problemMatcher": {
-                "base": "$gcc",
-                "fileLocation": "autoDetect",
-                "severity": "error",
-                "pattern": {
-                    "regexp": "^\"(.*?)\",(.*?)line (.*?)\\.(.*?)\\: (.*?)\\: (.*)",
-                    "file": 1,
-                    "line": 3,
-                    "column": 4,
-                    "code": 5,
-                    "message": 6
+            "command": "${workspaceFolder}/build/Make_4do_From_4dm_v14.bat",
+            "args": ["${file}"],
+            "options": { "cwd": "${fileDirname}" },
+            "group": "build",
+            "problemMatcher": [
+                {
+                    "owner": "12d",
+                    "source": "cc4d v14",
+                    "fileLocation": ["autoDetect", "${fileDirname}"],
+                    "pattern": {
+                        "regexp": "^\"(.+)\", line (\\d+)\\.(\\d+): (error|warning): (.*)$",
+                        "file": 1, "line": 2, "column": 3, "severity": 4, "message": 5
+                    }
+                },
+                {
+                    "owner": "12d",
+                    "source": "cc4d v14",
+                    "severity": "warning",
+                    "fileLocation": ["autoDetect", "${fileDirname}"],
+                    "pattern": {
+                        "regexp": "^(.+?):(\\d+): (.+): file not found$",
+                        "file": 1, "line": 2, "message": 3
+                    }
                 }
-            },
+            ],
             "presentation": {
                 "echo": false,
-                "reveal": "never",
+                "reveal": "always",
+                "revealProblems": "onProblem",
                 "panel": "dedicated",
-                "focus": true,
+                "focus": false,
                 "clear": true
             }
         },
         {
-            "label": "V14 - Build",
-            "dependsOrder": "sequence",
-            "dependsOn": [
-                "V14 - Compile 4dm to 4do custom batch file (12d model macro)"
-            ],
-            "group": {
-                "kind": "build",
-                "isDefault": false
-            },
-            "problemMatcher": [
-                "$gcc"
-            ]
-        },
+            // regenerates the API prototype list used for IntelliSense (Tag Parser) and highlighting
+            "label": "12dPL: Regenerate prototypes file (v15)",
+            "type": "process",
+            "command": "C:/Program Files/12d/12dmodel/15.00/nt.x64/cc4d.exe",
+            "args": ["-list", "${workspaceFolder}/include/prototypesv15.4dm"],
+            "options": { "cwd": "${workspaceFolder}" },
+            "problemMatcher": []
+        }
     ]
-    }
+}

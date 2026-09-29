@@ -1,20 +1,14 @@
 {
+    // IntelliSense for 12dPL (.4dm/.H/.4d are mapped to C++ in settings.json, using the Tag Parser engine).
+    // Personal include folders from other repos belong in your *user* settings as "C_Cpp.default.includePath",
+    // which "${default}" pulls in here, rather than in this public file.
     "configurations": [
         {
-            "name": "Win32",
+            "name": "12d Model v15",
             "includePath": [
                 "${default}",
-                "${workspaceRoot}",
                 "${workspaceFolder}/**",
-                "${workspaceFolder}",
-                "${workspaceFolder}/include",
-                "${workspaceFolder}/../12dMac/include",
                 "C:/Program Files/12d/12dmodel/15.00/set_ups"
-            ],
-            "defines": [
-                "_DEBUG",
-                "UNICODE",
-                "_UNICODE"
             ],
             "cStandard": "c17",
             "cppStandard": "c++17",

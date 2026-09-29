@@ -1,33 +1,40 @@
 # 12d Public
 
-Publicly visible 12d stuff
+12dPL macros and the **mashy_lib** include library for 12d Model, with a ready-to-go VS Code setup.
+
+12dPL (the 12d Programming Language, formerly 4DML) is the C-like macro language built into 12d Model. Macro sources are `.4dm` files, includable headers are `.H`/`.h`/`.4d`, and `cc4d.exe` compiles them to `.4do` files that you run inside 12d Model.
+
+Shout me out if there's something helpful or useful.
 
 ## Directories
-* /.vscode/ : vscode setup
-* /bin/     : some 4do's compile from /src/
-* /build/   : batch file used by vscode to call cc4d.exe and 4dm->4do
-* /include/ : Over time I'll add various functions from my librarys
-* /src/     : Over time I'll add various macro source
+* `/.vscode/` : VS Code setup (build tasks, problem matchers, IntelliSense)
+* `/bin/`     : compiled `.4do` files built from `/src/`, each with a `.json` of build info
+* `/build/`   : batch files that VS Code uses to call `cc4d.exe` and turn a `.4dm` into a `.4do`
+* `/include/` : the mashy_lib headers (`mashy_lib_*.H`), plus headers from the 12d forums under `/include/12d/`
+* `/src/`     : macro source, grouped by theme
+* `/test/`    : experimental and prototype macros
 
-Shout me out if there's something helpful or useful
+## Setup
 
-## REPO NOTES
+### 12d version
+* The current setup is for **12d Model v15**.
+* The path to `cc4d.exe` is hardcoded in three places. Change all three for a newer or different 12d Model version:
+  * `build/Make_4do_From_4dm.bat`
+  * the prototypes task in `.vscode/tasks.json`
+  * the `set_ups` include path in `.vscode/c_cpp_properties.json`
+* `build/Make_4do_From_4dm_v14.bat` targets v14.
 
-* This is a place to store some of my macro source code and setup
+### VS Code
+* Use **Open Folder...** and select the base repo folder. VS Code offers to install the C/C++ extension it needs.
+* **Ctrl+Shift+B** compiles the file you have open (task **12dPL: Compile macro (v15)**). Compiler errors show up in the Problems panel.
+* A successful compile copies the `.4do` to `/bin/`. A failed compile leaves the last good build there.
+* The task **12dPL: Regenerate prototypes file (v15)** rebuilds `/include/prototypesv15.4dm`, which gives most of the highlighting and IntelliSense for 12dPL.
 
-## SETUP NOTES
+### Includes (CPATH)
+* No setup is needed. The build batch files put this repo's `/include/` folder on `CPATH` for each compile.
+* If you already have your own `CPATH` (for example, one pointing at another repo's include folder), it's still searched after this repo's.
+* If you set `CPATH` yourself, separate multiple paths with a **Unix** colon `:`. Windows `;` doesn't work with `cc4d.exe`.
 
-### 12d Version
-* Current setup is for **v15**
-* Hardcoded paths to **cc4d.exe** are in __./vscode/tasks.json__ & __/build/Make_4do_From_4dm.bat__
-* The above files should be changed for a newer/different 12d Model Version
+## Disclaimer
 
-### VSCODE
-* There is a .vscode folder ready to go
-* From vscode use **Open Folder...** and select the base repo folder
-* There is a task to generate a new protypes file
-* The prototypes.4dm file within /include/ gets most of the highlighting for the 4dm language
-
-### CPATH
-* Set the windows environment variable **CPATH** to be equal to **drive:/full/path/12dPub/include**
-* If more that 1 path is required they must be **unix** colon **:** seperated ( windows ; _does not work_ , not sure if it's just cc4d.exe)
+12d and 12d Model are trademarks of 12d Solutions Pty Ltd. This repo is not affiliated with or endorsed by 12d Solutions.
