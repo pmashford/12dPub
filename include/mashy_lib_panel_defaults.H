@@ -78,7 +78,7 @@ Integer read_panel(Panel &panel, Text file_name, Integer verbose){
 		if(verbose) Print("<"+file_name+"> File found, panel settings loaded\n");
 		return Read_SLX(panel,file_name);
 	}else{
-		Print("not found\n");
+		// Print("not found\n");
 		Text base_file_name, old_file_name = "" , env = "" ;
 		base_file_name = get_file_path_filename(file_name); // instead of a full path we want to ensure this is file.ext only
 		file_name = Find_system_file   (base_file_name, old_file_name, env);
