@@ -318,10 +318,10 @@ void afx_logo(Draw_Box box, Real t, Real w, Real h, Real horizon)
       ord[n] = g;
       key[n] = wz[b0 + 1] + wz[b0 + 2] + wz[b0 + 3] + wz[b0 + 4];
    }
-   for (Integer p = 2; p <= n; ++p) {
-      Integer fo = ord[p];
-      Real ko = key[p];
-      Integer q = p - 1;
+   for (Integer sort_i = 2; sort_i <= n; ++sort_i) {
+      Integer fo = ord[sort_i];
+      Real ko = key[sort_i];
+      Integer q = sort_i - 1;
       while (q >= 1) {
          if (key[q] >= ko) break;
          ord[q + 1] = ord[q];
@@ -498,22 +498,22 @@ Integer afx_start_pump(Text title, Integer w, Integer h)
 Text afx_macro_path()
 {
    Text src = Get_macro_name();
-   Text p = "";
+   Text expanded = "";
    for (Integer i = 1; i <= Text_length(src); ++i) {
       Text ch = Get_subtext(src, i, i);
       if (ch == "/") ch = "\\";
-      p += ch;
+      expanded += ch;
    }
-   if (Get_subtext(p, 1, 1) == "$") {
-      Integer slash = Find_text(p, "\\");
-      Integer end = Text_length(p) + 1;
+   if (Get_subtext(expanded, 1, 1) == "$") {
+      Integer slash = Find_text(expanded, "\\");
+      Integer end = Text_length(expanded) + 1;
       if (slash > 0) end = slash;
-      Text name = Text_upper(Get_subtext(p, 2, end - 1));
+      Text name = Text_upper(Get_subtext(expanded, 2, end - 1));
       Text root = Getenv(name);
       if (root == "") root = Getenv(name + "_4D");
-      if (root != "") p = root + Get_subtext(p, end, Text_length(p));
+      if (root != "") expanded = root + Get_subtext(expanded, end, Text_length(expanded));
    }
-   return p;
+   return expanded;
 }
 
 // Explorer with the .4do selected, started through cmd's "start" (as the
