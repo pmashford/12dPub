@@ -1,5 +1,5 @@
-#ifndef mashy_lib_widgets_standard_H_included
-#define mashy_lib_widgets_standard_H_included
+#ifndef mashy_lib_widgets_source_box_H_included
+#define mashy_lib_widgets_source_box_H_included
 
 #include "mashy_lib_element_functions.H"
 

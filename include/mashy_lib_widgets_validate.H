@@ -511,10 +511,35 @@ Integer check(Textstyle_Data_Box box, Textstyle_Data &value, Message_Box message
 }
 
 //	NEW XYZ BOX
+// Validate(New_XYZ_Box) never returns NO_NAME (12d 15.00): an empty box
+// returns 0, the same as a bad value. A bad field comes back null; an
+// empty field comes back as leftover memory -- a denormal such as
+// 1.38566e-311 that prints as 0.000 but is NOT == 0. A fully typed
+// "0 0 0" returns TRUE, so a 0 return with all three values tiny means the
+// box is empty. (Heuristic: the leftover value isn't guaranteed.)
+Integer new_xyz_field_empty(Real v){
+	if(Is_null(v))return 0;
+	if(Absolute(v) < 1.0e-300)return 1;
+	return 0;
+}
+
+Integer new_xyz_is_empty(New_XYZ_Box box){
+	Real x, y, z;
+	Integer ierr = Validate(box,x,y,z);
+	if(ierr == NO_NAME)return 1;
+	if(ierr == TRUE)return 0;
+	if(!new_xyz_field_empty(x))return 0;
+	if(!new_xyz_field_empty(y))return 0;
+	if(!new_xyz_field_empty(z))return 0;
+	return 1;
+}
+
 Integer check(New_XYZ_Box box, Real &x, Real &y, Real &z, Message_Box message){
 	Integer ierr = Validate(box,x,y,z);
 	if(ierr == NO_NAME || ierr == TRUE){
 		return 0;
+	}else if(new_xyz_is_empty(box)){
+		return 0; // empty is fine for check(); must_exist() still rejects it
 	}else{
 		Set_data(message,"invalid xyz!");
 		set_focus(box);
